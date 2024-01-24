@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -32,6 +34,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private static final String BEARER = "Bearer ";
     @Autowired
     private  JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
     
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
     
@@ -48,9 +52,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // Access Token 유효성 검사
         	// to-be jwt exception 추가 개발 필요 (현재는 500에러 내려옴)
             if(jwtTokenProvider.validateAccessToken(accessToken)) {
-            	
-            	Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-            	SecurityContextHolder.getContext().setAuthentication(authentication);
+            	String blToken = (String)redisTemplate.opsForValue().get(accessToken);
+            	// 해당 토큰이 블랙리스트 처리된 토큰인지 확인
+            	if (ObjectUtils.isEmpty(blToken)) {
+            		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+                	SecurityContextHolder.getContext().setAuthentication(authentication);
+            	}
             }else {
             	throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
             }
