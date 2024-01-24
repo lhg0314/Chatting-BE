@@ -18,6 +18,7 @@ import com.project.chatting.auth.JwtTokenProvider;
 import com.project.chatting.auth.RefreshToken;
 import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.ConflictException;
+import com.project.chatting.exception.TokenException;
 import com.project.chatting.user.entity.User;
 import com.project.chatting.user.repository.UserRepository;
 import com.project.chatting.user.request.signinRequest;
@@ -79,7 +80,23 @@ public class UserService  {
         }
     }
 
-
-	
+	public void logout(String accessToken) {
+		if (!jwtTokenProvider.validateAccessToken(accessToken)) {
+			throw new TokenException(String.format("토큰이 만료되었습니다."), ErrorCode.TOKEN_EXPIRED_EXCEPTION);
+		}
+		
+		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+		if (redisTemplate.opsForValue().get("RT:"+authentication.getName()) != null) {
+			//레디스에서 해당 id-토큰 삭제
+			redisTemplate.delete("RT:"+authentication.getName());
+		}
+		
+		//엑세스 토큰 남은 유효시간
+        Long expiration = jwtTokenProvider.getExpiration(accessToken);
+        System.out.println("expiration Time: "+expiration);
+        
+        //로그아웃 후 유효한 토큰으로 접근가능하기 때문에 만료전 로그아웃된 accesstoken은 블랙리스트로 관리
+        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+	}
 
 }

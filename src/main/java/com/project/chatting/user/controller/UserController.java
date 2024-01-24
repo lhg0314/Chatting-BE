@@ -16,7 +16,7 @@ import com.project.chatting.user.request.SignupRequest;
 import com.project.chatting.user.request.signinRequest;
 import com.project.chatting.user.service.UserService;
 
-
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -60,7 +60,17 @@ public class UserController {
 		
 	}
 	
-	
-
+	/**
+	 * 로그아웃처리
+	 */
+	@PostMapping("/auth/signout")
+	public ApiResponse<String> logoutUser(@Valid HttpServletRequest req) {
+		String accessToken = req.getHeader("Authorization").split(" ")[1];
+		System.out.println("logout-accessToken: "+accessToken);
+		
+		userService.logout(accessToken);
+		
+		return ApiResponse.SUCCESS;
+	}
 
 }

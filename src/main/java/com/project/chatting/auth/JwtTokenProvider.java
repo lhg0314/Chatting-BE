@@ -149,4 +149,11 @@ public class JwtTokenProvider {
         }
         return null;
     }
+	
+	public Long getExpiration(String accessToken) {
+		Key secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+		Date expiration = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody().getExpiration();
+		
+		return expiration.getTime() - new Date().getTime();
+	}
 }
