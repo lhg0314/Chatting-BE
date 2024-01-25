@@ -96,6 +96,15 @@ public class ControllerAdvice {
         return ApiResponse.error(exception.getErrorCode());
     }
 
+    /**
+     * Token Expired Exception 
+     */
+    @ExceptionHandler(TokenException.class)
+    protected ApiResponse<Object> handleTokenExpiredException(final TokenException exception){
+        log.error(exception.getMessage(), exception);
+        return ApiResponse.error(exception.getErrorCode());
+    }
+
 
 
 
