@@ -118,25 +118,26 @@ public class JwtTokenProvider {
         	return true;
         } catch (SecurityException | MalformedJwtException e) {
         	log.error(e.getMessage());
-            //throw new ConflictException("Invalid JWT token: {}", ErrorCode.CONFLICT_MEMBER_EXCEPTION);
+            throw new ConflictException("Invalid JWT token: {}", ErrorCode.CONFLICT_MEMBER_EXCEPTION);
         } catch (ExpiredJwtException e) {
-            //throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
-        	log.error(e.getMessage());
+            log.error(e.getMessage());
+            throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
         } catch (IllegalArgumentException e) {
-            //throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
-        	log.error(e.getMessage());
+            log.error(e.getMessage());
+            throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
         }
-        return false;
+        // return false;
     }
  
-	public void validateRefreshToken(String refreshToken) {
+	public boolean validateRefreshToken(String refreshToken) {
     	Key secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(refreshToken);
+            return true;
         } catch (SecurityException | MalformedJwtException e) {
-            throw new  ConflictException(String.format("Invalid JWT token: {}", ErrorCode.CONFLICT_MEMBER_EXCEPTION));
+            throw new  ConflictException("Invalid JWT token: {}", ErrorCode.CONFLICT_MEMBER_EXCEPTION);
         } catch (ExpiredJwtException e) {
-            throw new ConflictException(String.format("토큰이 만료되었습니다.", ErrorCode.CONFLICT_MEMBER_EXCEPTION));
+            throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
         } catch (IllegalArgumentException e) {
             throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
         }
@@ -156,4 +157,21 @@ public class JwtTokenProvider {
 		
 		return expiration.getTime() - new Date().getTime();
 	}
+
+    private Claims getAllClaims(String token){
+        Key secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+    }
+
+    public String getUserIdFromToken(String token){
+        try{
+            Claims claims = getAllClaims(token);
+            String userId = String.valueOf(claims.getSubject());
+            return userId;
+        }catch(ExpiredJwtException e){
+            Claims exClaims = e.getClaims();
+            String exUserId = String.valueOf(exClaims.getSubject());
+            return exUserId;
+        }
+    }
 }

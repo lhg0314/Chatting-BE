@@ -19,7 +19,7 @@ public enum ErrorCode {
     CONFLICT_NICKNAME_EXCEPTION("C006", "이미 존재하는 닉네임입니다"),
     CONFLICT_MEMBER_EXCEPTION("C007", "이미 존재하는 아이디입니다"),
 	
-	TOKEN_EXPIRED_EXCEPTION("C008", "토큰이 만료되었습니다.");
+	TOKEN_EXPIRED_EXCEPTION("C008", "토큰이 만료되었습니다. 다시 로그인 해주세요");
 
     private final String code;
     private final String message;
