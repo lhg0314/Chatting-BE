@@ -1,6 +1,9 @@
 package com.project.chatting.user.service;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ import com.project.chatting.exception.TokenException;
 import com.project.chatting.user.entity.User;
 import com.project.chatting.user.repository.UserRepository;
 import com.project.chatting.user.request.signinRequest;
-
+import com.project.chatting.user.response.UserListResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -85,6 +88,7 @@ public class UserService  {
 			throw new TokenException(String.format("토큰이 만료되었습니다."), ErrorCode.TOKEN_EXPIRED_EXCEPTION);
 		}
 		
+		
 		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 		if (redisTemplate.opsForValue().get("RT:"+authentication.getName()) != null) {
 			//레디스에서 해당 id-토큰 삭제
@@ -97,6 +101,25 @@ public class UserService  {
         
         //로그아웃 후 유효한 토큰으로 접근가능하기 때문에 만료전 로그아웃된 accesstoken은 블랙리스트로 관리
         redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+	}
+	
+	public List<UserListResponse> getSortedUserList(String accessToken) {
+		if (!jwtTokenProvider.validateAccessToken(accessToken)) {
+			throw new TokenException(String.format("토큰이 만료되었습니다."), ErrorCode.TOKEN_EXPIRED_EXCEPTION);
+		}
+		
+		List<User> getList = userRepository.getSortedUserList();
+		List<UserListResponse> resList = new ArrayList<UserListResponse>();
+		
+		for (int i=0; i<getList.size(); i++) {
+			User user = getList.get(i);
+			
+			UserListResponse resUser = UserListResponse.toDto(user);
+			
+			resList.add(resUser);
+		}
+		
+		return resList;
 	}
 
 }
