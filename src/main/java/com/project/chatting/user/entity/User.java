@@ -20,7 +20,7 @@ public class User implements UserDetails {
 	@Id
 	private String userId;
 	private String userPw;
-	private String userName;
+	private String name;
 	private Date userRegdate;
 	private String refreshToken; // 레디스에서 관리예정이므로 추후 삭제
 	
@@ -28,7 +28,7 @@ public class User implements UserDetails {
 		// TODO Auto-generated constructor stub
 		this.userId = userId;
 		this.userPw = pw;
-		this.userName = name;
+		this.name = name;
 	}
 
 	  @Override
