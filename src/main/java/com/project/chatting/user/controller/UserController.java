@@ -1,8 +1,13 @@
 package com.project.chatting.user.controller;
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,7 +66,7 @@ public class UserController {
 	}
 	
 	/**
-	 * 로그아웃처리
+	 * 로그아웃
 	 */
 	@PostMapping("/auth/signout")
 	public ApiResponse<String> logoutUser(@Valid HttpServletRequest req) {
@@ -71,6 +76,20 @@ public class UserController {
 		userService.logout(accessToken);
 		
 		return ApiResponse.SUCCESS;
+	}
+	
+	/**
+	 * 사용자 목록 조회
+	 */
+	@GetMapping("/list")
+	public ApiResponse<Map<String, Object>> getUserList(@Valid HttpServletRequest req) {
+		String accessToken = req.getHeader("Authorization").split(" ")[1];
+		System.out.println("logout-accessToken: "+accessToken);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("list", userService.getSortedUserList(accessToken));
+		
+		return ApiResponse.success(result);
 	}
 
 }

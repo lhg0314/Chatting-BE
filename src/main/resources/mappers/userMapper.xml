@@ -17,7 +17,7 @@
             (
                 #{userId}
                 , #{userPw}
-                , #{userName}
+                , #{name}
             )
 	</insert>
 	
@@ -25,4 +25,8 @@
 	<select id="findMemberById"  parameterType="String" resultType="com.project.chatting.user.entity.User">
         SELECT * FROM user WHERE user_id = #{userId}
     </select>
+    
+    <select id="getSortedUserList" resultType="com.project.chatting.user.entity.User">
+		SELECT * FROM user ORDER BY user_name
+	</select>
 </mapper>
