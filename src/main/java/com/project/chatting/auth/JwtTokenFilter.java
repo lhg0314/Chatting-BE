@@ -170,7 +170,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
                 System.out.println("refresh Token 유효성 통과");
             }
+        }catch(ConflictException e){
+            request.setAttribute("exception", new ConflictException("유효하지 않은 토큰입니다.", ErrorCode.CONFLICT_TOKEN_EXCEPTION));
         }
+        
         if(!flag) {
             System.out.println("그냥 실행");
             filterChain.doFilter(request, response);
