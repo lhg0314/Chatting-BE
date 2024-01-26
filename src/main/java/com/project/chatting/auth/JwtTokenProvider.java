@@ -5,6 +5,7 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,4 +174,22 @@ public class JwtTokenProvider {
             return exUserId;
         }
     }
+    
+    public void deleteAccessToken(HttpServletRequest request) {
+    	String accessToken = resolveToken(request);
+    	
+    	if (validateAccessToken(accessToken)) {
+    		//레디스에서 해당 id-토큰 삭제
+			redisTemplate.delete("RT:"+getUserIdFromToken(accessToken));
+			
+			//엑세스 토큰 남은 유효시간
+	        Long expiration = getExpiration(accessToken);
+	        System.out.println("expiration Time: "+expiration);
+	        
+	        //로그아웃 후 유효한 토큰으로 접근가능하기 때문에 만료전 로그아웃된 accesstoken은 블랙리스트로 관리
+	        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+    	}
+    	
+    }
+
 }
