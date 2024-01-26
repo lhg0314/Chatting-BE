@@ -1,0 +1,29 @@
+package com.project.chatting.config;
+
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/sub"); // 메시지 send
+        config.setApplicationDestinationPrefixes("/pub"); // 메시지 recieve
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws") // 엔드포인트 설정
+                .setAllowedOriginPatterns("*") // cors모두 허용
+                .withSockJS();
+    }
+    
+    // 소켓 연결시 jwt유효성 검증
+
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors();
+//    }
+}
