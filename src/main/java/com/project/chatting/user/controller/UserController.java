@@ -69,11 +69,8 @@ public class UserController {
 	 * 로그아웃
 	 */
 	@PostMapping("/auth/signout")
-	public ApiResponse<String> logoutUser(@Valid HttpServletRequest req) {
-		String accessToken = req.getHeader("Authorization").split(" ")[1];
-		System.out.println("logout-accessToken: "+accessToken);
-		
-		userService.logout(accessToken);
+	public ApiResponse<String> logoutUser(HttpServletRequest req) {
+		userService.logout(req);
 		
 		return ApiResponse.SUCCESS;
 	}
@@ -82,12 +79,9 @@ public class UserController {
 	 * 사용자 목록 조회
 	 */
 	@GetMapping("/list")
-	public ApiResponse<Map<String, Object>> getUserList(@Valid HttpServletRequest req) {
-		String accessToken = req.getHeader("Authorization").split(" ")[1];
-		System.out.println("logout-accessToken: "+accessToken);
-		
+	public ApiResponse<Map<String, Object>> getUserList(HttpServletRequest req) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("list", userService.getSortedUserList(accessToken));
+		result.put("list", userService.getSortedUserList());
 		
 		return ApiResponse.success(result);
 	}
