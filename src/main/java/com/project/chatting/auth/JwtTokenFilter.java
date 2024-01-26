@@ -57,13 +57,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
     
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
-    private boolean flag = false;
+    
 
 	@Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
         String path = request.getRequestURI();
         System.out.println("path: " + path);
+        boolean flag = false;
+
         if (Arrays.stream(WHITELIST).anyMatch(pattern -> antPathMatcher.match(pattern, path))) {
             filterChain.doFilter(request, response);
             return;
