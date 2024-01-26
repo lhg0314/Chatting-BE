@@ -129,11 +129,10 @@ public class JwtTokenProvider {
         // return false;
     }
  
-	public boolean validateRefreshToken(String refreshToken) {
+	public void validateRefreshToken(String refreshToken) {
     	Key secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(refreshToken);
-            return true;
         } catch (SecurityException | MalformedJwtException e) {
             throw new  ConflictException("Invalid JWT token: {}", ErrorCode.CONFLICT_MEMBER_EXCEPTION);
         } catch (ExpiredJwtException e) {
