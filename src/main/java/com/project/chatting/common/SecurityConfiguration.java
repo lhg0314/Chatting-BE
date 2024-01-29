@@ -48,7 +48,7 @@ public class SecurityConfiguration{
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return webSecurity -> webSecurity.ignoring().requestMatchers("/docs/**", "/error", "/v3/api-docs/**");
+        return webSecurity -> webSecurity.ignoring().requestMatchers("/docs/**", "/error", "/v3/api-docs/**","/resources/**");
     }
 	
 	@Bean
@@ -62,13 +62,20 @@ public class SecurityConfiguration{
             // 모두 허용
             .requestMatchers(
             		  "/user/auth/signin", // 로그인
-            	      "/user/auth/signup"  
+            	      "/user/auth/signup",
+            	      "/index.html",
+            	      "/app.js",
+            	      "/ws/**" ,
+            	      "/webjars/**"
             ).permitAll()
             // 그 외는 인증 필요
             .anyRequest().authenticated())
           // jwt filter 추가
           .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+        
+        
+       
     }
 
 
