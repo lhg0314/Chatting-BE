@@ -139,6 +139,8 @@ public class JwtTokenProvider {
             throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
         } catch (IllegalArgumentException e) {
             throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
+        } catch (SignatureException e){
+            throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
         }
     }
 	

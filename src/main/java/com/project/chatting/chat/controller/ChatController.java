@@ -17,9 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.response.ChatResponse;
+import com.project.chatting.chat.request.CreateJoinRequest;
+import com.project.chatting.chat.request.CreateRoomRequest;
+import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
 import com.project.chatting.user.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class ChatController {
@@ -45,4 +50,32 @@ public class ChatController {
 //
 //		return ApiResponse.success(chatService.insertMessage(req));
 //	}
+
+
+	/**
+	 * 채팅방 생성
+	 */
+	@PostMapping("/chat/room")
+	public ApiResponse<Integer> createChatRoom(@Valid @RequestBody CreateRoomRequest createRoomRequest){
+
+		// 채팅방이 존재하는지 확인
+		int roomId = -1;
+		roomId = chatService.existChatRoom(createRoomRequest);
+		if(roomId == -1){
+			// 채팅방 없음
+			CreateRoomResponse createRoomResponse = chatService.createRoom(createRoomRequest);
+
+			// 채팅방 참여
+			CreateJoinRequest createJoinRequest = new CreateJoinRequest(createRoomRequest.getFromUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
+			chatService.createJoin(createJoinRequest);
+			createJoinRequest = new CreateJoinRequest(createRoomRequest.getToUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
+			chatService.createJoin(createJoinRequest);
+
+			roomId = createRoomRequest.getRoomId();
+		}
+
+		return ApiResponse.success(roomId);
+
+	}
+
 }
