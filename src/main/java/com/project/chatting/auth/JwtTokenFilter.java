@@ -136,6 +136,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 flag = false;
                 request.setAttribute("exception", new TokenException("토큰이 만료되었습니다. 다시 로그인해주세요.", ErrorCode.TOKEN_EXPIRED_EXCEPTION));
             }else{
+                refreshToken = refreshToken.replace("\"","");
+
                 try{
                     System.out.println("RefreshToken = " + refreshToken); 
                     jwtTokenProvider.validateRefreshToken(refreshToken);

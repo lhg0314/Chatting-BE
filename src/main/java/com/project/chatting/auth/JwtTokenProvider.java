@@ -131,6 +131,7 @@ public class JwtTokenProvider {
  
 	public void validateRefreshToken(String refreshToken) {
     	Key secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+        System.out.println("RefreshToken:::::" + refreshToken);
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(refreshToken);
         } catch (SecurityException | MalformedJwtException e) {
