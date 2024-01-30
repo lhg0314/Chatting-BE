@@ -22,7 +22,7 @@ function connect() {
         
         stompClient.subscribe('/sub/room/1', function (greeting) {
 			console.log(JSON.parse(greeting.body))
-            showGreeting(JSON.parse(greeting.body).message);
+            showGreeting(JSON.parse(greeting.body).data.msg);
         });
     });
 }
@@ -36,7 +36,7 @@ function disconnect() {
 }
 
 function sendName() {
-    stompClient.send("/pub/room/1", {}, JSON.stringify({'message': $("#name").val()}));
+    stompClient.send("/pub/chat/1", {}, JSON.stringify({'msg': $("#name").val()}));
 }
 
 function showGreeting(message) {
