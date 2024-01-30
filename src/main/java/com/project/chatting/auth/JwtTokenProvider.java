@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.project.chatting.common.ErrorCode;
@@ -31,6 +30,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -117,17 +117,16 @@ public class JwtTokenProvider {
         	//to-be jwt exception처리 추가
         	
         	return true;
-        } catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException e ) {
         	log.error(e.getMessage());
             throw new ConflictException("Invalid JWT token: {}", ErrorCode.CONFLICT_MEMBER_EXCEPTION);
         } catch (ExpiredJwtException e) {
             log.error(e.getMessage());
             throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
-        } catch (IllegalArgumentException e) {
+        } catch (SignatureException | IllegalArgumentException e) {
             log.error(e.getMessage());
             throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
         }
-        // return false;
     }
  
 	public void validateRefreshToken(String refreshToken) {
