@@ -60,19 +60,20 @@ public class ChatController {
 
 		// 채팅방이 존재하는지 확인
 		int roomId = -1;
+		
 		roomId = chatService.existChatRoom(createRoomRequest);
-		if(roomId == -1){
-			// 채팅방 없음
-			CreateRoomResponse createRoomResponse = chatService.createRoom(createRoomRequest);
+		// if(roomId == -1){
+		// 	// 채팅방 없음
+		// 	CreateRoomResponse createRoomResponse = chatService.createRoom(createRoomRequest);
 
-			// 채팅방 참여
-			CreateJoinRequest createJoinRequest = new CreateJoinRequest(createRoomRequest.getFromUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
-			chatService.createJoin(createJoinRequest);
-			createJoinRequest = new CreateJoinRequest(createRoomRequest.getToUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
-			chatService.createJoin(createJoinRequest);
+		// 	// 채팅방 참여
+		// 	CreateJoinRequest createJoinRequest = new CreateJoinRequest(createRoomRequest.getFromUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
+		// 	chatService.createJoin(createJoinRequest);
+		// 	createJoinRequest = new CreateJoinRequest(createRoomRequest.getToUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
+		// 	chatService.createJoin(createJoinRequest);
 
-			roomId = createRoomRequest.getRoomId();
-		}
+		// 	roomId = createRoomRequest.getRoomId();
+		// }
 
 		return ApiResponse.success(roomId);
 

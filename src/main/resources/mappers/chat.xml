@@ -8,15 +8,25 @@
 
   <!-- 채팅방 조회 -->
   <select id="findChatRoomByUserId" parameterType="com.project.chatting.chat.request.CreateRoomRequest" resultType="string">
-    SELECT IFNULL(room_id, -1) AS room_id FROM chatJoin WHERE user_Id IN (#{toUserId}, #{fromUserId}) GROUP BY room_id HAVING COUNT(DISTINCT user_id) = 2;
-  
+    SELECT IFNULL(room_id, -1) AS room_id 
+    FROM chatJoin 
+    <!-- WHERE user_Id IN (#{toUserId}, #{fromUserId}) GROUP BY room_id HAVING COUNT(DISTINCT user_id) = 2; -->
+    WHERE user_id IN (
+      <foreach collection="userId" item="user" separator=",">
+        #{user}
+      </foreach>
+    )
+    GROUP BY room_id HAVING COUNT(DISTINCT user_id) = #{userCount};
   </select>
+
+
   <!-- 채팅방 생성 -->
   <insert id="setChatRoom" parameterType="com.project.chatting.chat.request.CreateRoomRequest" useGeneratedKeys="true" keyProperty="roomId" keyColumn="room_id">
     INSERT INTO chatRoom (room_name) VALUES (#{roomName})
   </insert>
 
   <!-- 채팅방 참여 생성 -->
+  <!-- 수정 필요 -->
   <insert id="setChatJoin" parameterType="com.project.chatting.chat.request.CreateJoinRequest">
     INSERT INTO chatJoin (user_id, room_id, room_state) VALUES (#{userId}, #{roomId}, #{roomState})
   </insert>
