@@ -27,5 +27,5 @@ public class ChatRequest {
 	private String createAt;
 	private int readCnt;
 	
-	private String[] users;
+	private List<String> users;
 }

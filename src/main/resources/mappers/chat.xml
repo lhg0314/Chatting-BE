@@ -25,6 +25,7 @@
     WHERE a.users = (#{users})
   </select>
 
+
   <!-- 채팅방 생성 -->
   <insert id="setChatRoom" parameterType="com.project.chatting.chat.request.CreateRoomRequest" useGeneratedKeys="true" keyProperty="roomId" keyColumn="room_id">
     INSERT INTO chatRoom (room_name) VALUES (#{roomName})
@@ -43,9 +44,20 @@
     </foreach>
   </insert>
   
-  <select id="getChatMemberCnt" parameterMap="int" resultType="int">
+  <select id="getChatMemberCnt" parameterType="int" resultType="int">
 	  SELECT COUNT(*) FROM chatJoin WHERE room_id = #{roomID}
   </select>
+  
+  <insert id="setChatMessage" parameterType="com.project.chatting.chat.request.ChatRequest">
+	  INSERT INTO chatContents(room_id, user_id, message, message_type, createAt, readCnt) 
+	  VALUES(#{roomId}, #{userId}, #{message}, #{messageType}, #{createAt}, #{readCnt});
+  </insert>
+  
+  <insert id="setChatRead" parameterType="com.project.chatting.chat.request.ChatReadRequest">
+	  INSERT INTO chatRead(chat_id, room_id, user_id, read_yn) 
+	  VALUES((SELECT chat_id 
+	  			FROM chatContents WHERE user_id = #{userId} AND createAt = #{createAt}), #{roomId}, #{userId}, #{readYn}); 
+  </insert>
 
   <!-- 채팅방 목록 조회 -->
   <select id="selectChatRoomList" parameterType="String">
@@ -56,4 +68,5 @@
     AND J.user_id = #{userId}
     AND J.room_state = "Y"
   </select>
+  
 </mapper>

@@ -44,7 +44,7 @@ public class ChatController {
 	
 	@PostMapping(value="/chat/get")
 	public void send() {
-		chatService.get();
+		chatService.setMessages();
 	}
 
 
