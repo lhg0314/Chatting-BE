@@ -69,7 +69,7 @@ public class UserService  {
         String refreshToken = jwtTokenProvider.createRefreshToken(authentication); // Refresh Token 발급
         
 
-        RefreshToken token = new RefreshToken(authentication.getName(), accessToken, refreshToken); 
+        RefreshToken token = new RefreshToken(authentication.getName(), accessToken, refreshToken,userDetails.getName()); 
         redisTemplate.opsForValue().set("RT:"+signinReq.getUserId(),refreshToken,REFRESH_TOKEN_EXPIRE_TIME,TimeUnit.MILLISECONDS); // redis 캐시에 refrash Token 저장
         //tokenRepository.save(token); queryDsl 방식도 사용가능
         
