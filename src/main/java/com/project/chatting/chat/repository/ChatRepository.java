@@ -9,11 +9,15 @@ import com.project.chatting.chat.response.ChatRoomResponse;
 @Mapper
 public interface ChatRepository {
 
-	public String findChatRoomByUserId(CreateRoomRequest createRoomRequest);
+	// public String findChatRoomByUserId(CreateRoomRequest createRoomRequest);
+	public String findChatRoomByUserId(String users);
 
 	public int setChatRoom(CreateRoomRequest createRoomRequest);
 
-	public void setChatJoin(CreateJoinRequest createJoinRequest);
+	public void setChatJoin(List<CreateJoinRequest> createJoinRequest);
+	
+	public int getChatMemberCnt(int roomId);
 
 	public List<ChatRoomResponse> selectChatRoomList(String userId);
+	
 }

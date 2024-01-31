@@ -81,10 +81,10 @@ public class SecurityConfiguration{
             .requestMatchers(
             		  "/user/auth/signin", // 로그인
             	      "/user/auth/signup",
-            	      "/index.html",
-            	      "/app.js",
             	      "/ws/**" ,
-            	      "/webjars/**"
+            	      "/webjars/**",
+            	      "/**.html",
+            	      "/**.js"
             ).permitAll()
             // 그 외는 인증 필요
             .anyRequest().authenticated())

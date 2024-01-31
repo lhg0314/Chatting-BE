@@ -1,5 +1,9 @@
 package com.project.chatting.chat.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,8 +22,6 @@ import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
 import com.project.chatting.user.service.UserService;
 import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class ChatController {
@@ -33,18 +35,17 @@ public class ChatController {
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
 		req.setRoomId(roomId);
-		if (req.getMsgType() == "FILE") {
-			req.setMsg("");
+		if (req.getMessageType() == "FILE") {
+			req.setMessage("");
 		}
 		
 		return ApiResponse.success(chatService.insertMessage(req));
 	}
-//	
-//	@PostMapping(value="/chat/send")
-//	public ApiResponse<ChatResponse> send(@RequestBody ChatRequest req) {
-//
-//		return ApiResponse.success(chatService.insertMessage(req));
-//	}
+	
+	@PostMapping(value="/chat/get")
+	public void send() {
+		chatService.get();
+	}
 
 
 	/**
@@ -55,18 +56,20 @@ public class ChatController {
 
 		// 채팅방이 존재하는지 확인
 		int roomId = -1;
+		
 		roomId = chatService.existChatRoom(createRoomRequest);
 		if (roomId == -1) {
 			// 채팅방 없음
 			CreateRoomResponse createRoomResponse = chatService.createRoom(createRoomRequest);
 
 			// 채팅방 참여
-			CreateJoinRequest createJoinRequest = new CreateJoinRequest(createRoomRequest.getFromUserId(),
-					createRoomResponse.getRoomId(), "Y"); // user 1
-			chatService.createJoin(createJoinRequest);
-			createJoinRequest = new CreateJoinRequest(createRoomRequest.getToUserId(), createRoomResponse.getRoomId(),
-					"Y"); // user 1
-			chatService.createJoin(createJoinRequest);
+			List<CreateJoinRequest> createJoinRequestList = new ArrayList<>();
+			
+			for(String user : createRoomRequest.getUserId()){
+				createJoinRequestList.add(new CreateJoinRequest(user, createRoomResponse.getRoomId(), "Y"));
+			}
+
+			chatService.createJoin(createJoinRequestList);
 
 			roomId = createRoomRequest.getRoomId();
 		}
