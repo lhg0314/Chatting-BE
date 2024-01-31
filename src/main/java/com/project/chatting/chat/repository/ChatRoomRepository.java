@@ -2,11 +2,15 @@ package com.project.chatting.chat.repository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
+
+import java.util.Arrays;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -17,6 +21,8 @@ public class ChatRoomRepository {
     public static final String USER_COUNT = "USER_COUNT"; // 채팅룸에 입장한 클라이언트수 저장
     public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
     @Resource(name = "redisTemplate")
     private ValueOperations<String, String> valueOps;
     
@@ -29,8 +35,8 @@ public class ChatRoomRepository {
     }
     
     // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
-    public void setUserEnterInfo(String sessionId, String roomId) {
-        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
+    public void setUserEnterInfo(String sessionId, String roomId,String userId) {
+        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId+"/"+userId );
     }
     
     // 유저 세션정보와 맵핑된 채팅방ID 삭제
@@ -39,17 +45,22 @@ public class ChatRoomRepository {
     }
 
     // 채팅방 유저수 조회
-    public long getUserCount(String roomId) {
-        return Long.valueOf(Optional.ofNullable(valueOps.get(USER_COUNT + "_" + roomId)).orElse("0"));
+    public String[] getUserCount(String roomId) {
+    	String[] originList = (String.valueOf(redisTemplate.opsForValue().get(USER_COUNT + "_" + roomId))).split(",");
+    	int position = originList.length;
+    	
+        return Arrays.copyOfRange(originList,1,position);
     }
 
     // 채팅방에 입장한 유저수 +1
-    public long plusUserCount(String roomId) {
-        return Optional.ofNullable(valueOps.increment(USER_COUNT + "_" + roomId)).orElse(0L);
+    public void plusUserCount(String roomId,String userId) {
+    	redisTemplate.opsForValue().set(USER_COUNT + "_" + roomId,redisTemplate.opsForValue().get(USER_COUNT + "_" + roomId)+ ","+ userId);
+        //return Optional.ofNullable(valueOps.increment(USER_COUNT + "_" + roomId)).orElse(0L);
     }
 
     // 채팅방에 입장한 유저수 -1
-    public long minusUserCount(String roomId) {
-        return Optional.ofNullable(valueOps.decrement(USER_COUNT + "_" + roomId)).filter(count -> count > 0).orElse(0L);
+    public void minusUserCount(String roomId,String userId) {
+    	System.out.println(userId);
+    	redisTemplate.opsForValue().set(USER_COUNT + "_" + roomId,redisTemplate.opsForValue().get(USER_COUNT + "_" + roomId).toString().replace(","+ userId, ""));
     }
 }
