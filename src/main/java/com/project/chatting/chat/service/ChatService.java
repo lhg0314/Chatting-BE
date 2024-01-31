@@ -66,6 +66,7 @@ public class ChatService {
 
 	// 채팅방 조회
 	public int existChatRoom(CreateRoomRequest createRoomRequest){
+		createRoomRequest.setUserCount(createRoomRequest.getUserId().size());
 		String result = chatRepository.findChatRoomByUserId(createRoomRequest);
 
 		return result == null ? -1 : Integer.parseInt(result) ;
@@ -83,4 +84,7 @@ public class ChatService {
 	public void createJoin(CreateJoinRequest createJoinRequest){
 		chatRepository.setChatJoin(createJoinRequest);
 	}
+
+	// 채팅방 나가기
+
 }
