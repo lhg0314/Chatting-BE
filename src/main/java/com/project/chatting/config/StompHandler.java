@@ -1,5 +1,7 @@
 package com.project.chatting.config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -30,8 +32,13 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        
+
+        
       
         if(accessor.getCommand() == StompCommand.CONNECT) {
+        	System.out.println(accessor);
+        	log.info("CONNECT"); 
         	// jwt 연동해보기
         }else if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
         	log.info("SUBSCRIBE"); // stompClient.subscribe 실행 시 호출
@@ -41,9 +48,13 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = destination.substring(lastIndex + 1);
            
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            chatRepo.setUserEnterInfo(sessionId, roomId);
+            String userId = jwtTokenProvider.getUserIdFromToken(accessor.getNativeHeader("Authorization").get(0));
+            chatRepo.setUserEnterInfo(sessionId, roomId,userId);
             
-            chatRepo.plusUserCount(roomId); // 유저 +1 처리
+            
+            chatRepo.plusUserCount(roomId,userId); // 유저 +1 처리
+            
+            System.out.println("인원수 조회:::::"+Arrays.toString(chatRepo.getUserCount(roomId)));
             
             //to-be
             // 1. 채팅방 입장시 안읽은 메시지 읽은 처리
@@ -53,11 +64,18 @@ public class StompHandler implements ChannelInterceptor {
         	System.out.println(accessor);
         	log.info("DISCONNECT"); // 소켓 연결 끊었을때 후에 필요할 경우 추가
         	String sessionId = (String) message.getHeaders().get("simpSessionId");
-            String roomId = chatRepo.getUserEnterRoomId(sessionId);
-          
+            String roomaAndUserInfo = chatRepo.getUserEnterRoomId(sessionId);
+            int index = 0;
+            String roomId = "";
+            String userId = "";
+            if(roomaAndUserInfo != null) {
+            	index = roomaAndUserInfo.indexOf("/");
+            	 roomId = roomaAndUserInfo.substring(0, index);
+            	 userId = roomaAndUserInfo.substring(index+1);
+            	 chatRepo.minusUserCount(roomId, userId);
+            }
             
-        	 //채팅방의 인원수를 -1한다.
-            chatRepo.minusUserCount(roomId);
+          
             chatRepo.removeUserEnterInfo(sessionId); // 세션 정보 삭제
         }
         return message;
