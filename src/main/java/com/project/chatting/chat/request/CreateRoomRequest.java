@@ -5,10 +5,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import java.util.List;
 
 @ToString
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateRoomRequest {
@@ -16,11 +19,10 @@ public class CreateRoomRequest {
   @NotBlank
   private String roomName;
 
-  @NotBlank
-  private String toUserId;
-
-  @NotBlank
-  private String fromUserId;
+  
+  private List<@NotBlank String> userId;
 
   private int roomId;
+
+  private int userCount;
 }

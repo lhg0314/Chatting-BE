@@ -7,6 +7,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -26,6 +29,7 @@ import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.user.repository.UserRepository;
+
 
 @Service
 public class ChatService {
@@ -66,7 +70,13 @@ public class ChatService {
 
 	// 채팅방 조회
 	public int existChatRoom(CreateRoomRequest createRoomRequest){
-		String result = chatRepository.findChatRoomByUserId(createRoomRequest);
+		createRoomRequest.setUserCount(createRoomRequest.getUserId().size());
+		Collections.sort(createRoomRequest.getUserId());
+
+		String users = createRoomRequest.getUserId().stream().collect(Collectors.joining(","));
+		System.out.println("Users : " + users);
+
+		String result = chatRepository.findChatRoomByUserId(users); 
 
 		return result == null ? -1 : Integer.parseInt(result) ;
 	}
@@ -80,7 +90,10 @@ public class ChatService {
 	}
 
 	// 채팅방 참여 생성
-	public void createJoin(CreateJoinRequest createJoinRequest){
+	public void createJoin(List<CreateJoinRequest> createJoinRequest){
 		chatRepository.setChatJoin(createJoinRequest);
 	}
+
+	// 채팅방 나가기
+
 }

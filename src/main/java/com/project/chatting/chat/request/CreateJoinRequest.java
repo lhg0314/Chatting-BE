@@ -11,6 +11,8 @@ public class CreateJoinRequest {
   private int roomId;
   private String roomState;
 
+  public CreateJoinRequest(){}
+
   public CreateJoinRequest(String userId, int roomId, String roomState){
     this.userId = userId;
     this.roomId = roomId;

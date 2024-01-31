@@ -2,6 +2,8 @@ package com.project.chatting.chat.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -60,16 +62,20 @@ public class ChatController {
 
 		// 채팅방이 존재하는지 확인
 		int roomId = -1;
+		
 		roomId = chatService.existChatRoom(createRoomRequest);
 		if(roomId == -1){
 			// 채팅방 없음
 			CreateRoomResponse createRoomResponse = chatService.createRoom(createRoomRequest);
 
 			// 채팅방 참여
-			CreateJoinRequest createJoinRequest = new CreateJoinRequest(createRoomRequest.getFromUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
-			chatService.createJoin(createJoinRequest);
-			createJoinRequest = new CreateJoinRequest(createRoomRequest.getToUserId(), createRoomResponse.getRoomId(),"Y"); // user 1
-			chatService.createJoin(createJoinRequest);
+			List<CreateJoinRequest> createJoinRequestList = new ArrayList<>();
+			
+			for(String user : createRoomRequest.getUserId()){
+				createJoinRequestList.add(new CreateJoinRequest(user, createRoomResponse.getRoomId(), "Y"));
+			}
+
+			chatService.createJoin(createJoinRequestList);
 
 			roomId = createRoomRequest.getRoomId();
 		}
