@@ -35,7 +35,6 @@
   </insert>
 
   <!-- 채팅방 참여 생성 -->
-  <!-- 수정 필요 -->
   <insert id="setChatJoin" parameterType="java.util.List">
     INSERT INTO chatJoin (user_id, room_id, room_state) 
     VALUES 
