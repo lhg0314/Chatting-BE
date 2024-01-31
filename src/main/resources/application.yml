@@ -1,9 +1,9 @@
 server:
   port: 8085
-  
+
 spring:
   profiles:
-    active: local   
+    active: local
   datasource:
     url: jdbc:mariadb://211.118.245.244:4120/chatting_program?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
@@ -13,28 +13,22 @@ spring:
     redis:
       host: localhost
       port: 6379
-  
-    
-mybatis:  
-  configuration:    
-    multiple-result-sets-enabled: false    
-    map-underscore-to-camel-case: true    
-    call-setters-on-nulls: true        
-    jdbc-type-for-null: varchar    
-    default-fetch-size: 500  
-  mapper-locations:  
-  - classpath:/mappers/*.xml
-  
+
+mybatis:
+  configuration:
+    multiple-result-sets-enabled: false
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+    jdbc-type-for-null: varchar
+    default-fetch-size: 500
+  mapper-locations:
+    - classpath:/mappers/*.xml
+
 jwt:
   secret: kevin1234123412341234123412341234
-  refresh-token-validity-in-seconds: 30000 # 30초 # 7200000 2시간
+  refresh-token-validity-in-seconds: 600000 # 10분 # 7200000 2시간
   access-token-validity-in-seconds: 10000 # 10초
-  
+
 logging:
   level:
     org.springframework.security: DEBUG
-
-
-
-     
-  

@@ -131,6 +131,7 @@ public class JwtTokenProvider {
  
 	public void validateRefreshToken(String refreshToken) {
     	Key secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+        System.out.println("RefreshToken:::::" + refreshToken);
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(refreshToken);
         } catch (SecurityException | MalformedJwtException e) {
@@ -138,6 +139,8 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             throw new TokenException("토큰이 만료되었습니다.", ErrorCode.TOKEN_EXPIRED_EXCEPTION);
         } catch (IllegalArgumentException e) {
+            throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
+        } catch (SignatureException e){
             throw new ConflictException(String.format(e.getMessage(), ErrorCode.CONFLICT_MEMBER_EXCEPTION));
         }
     }

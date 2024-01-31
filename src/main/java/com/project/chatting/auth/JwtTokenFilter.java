@@ -27,6 +27,7 @@ import com.project.chatting.user.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -135,6 +136,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 flag = false;
                 request.setAttribute("exception", new TokenException("토큰이 만료되었습니다. 다시 로그인해주세요.", ErrorCode.TOKEN_EXPIRED_EXCEPTION));
             }else{
+                refreshToken = refreshToken.replace("\"","");
+
                 try{
                     System.out.println("RefreshToken = " + refreshToken); 
                     jwtTokenProvider.validateRefreshToken(refreshToken);
@@ -166,6 +169,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }catch(ExpiredJwtException ex){
                     throw new TokenException(ex.getMessage());
                 } catch(IllegalArgumentException ex){
+                    throw new ConflictException(ex.getMessage());
+                } catch(SignatureException ex){
                     throw new ConflictException(ex.getMessage());
                 }
                 System.out.println("refresh Token 유효성 통과");
