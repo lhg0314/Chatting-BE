@@ -62,7 +62,7 @@ public class UserService  {
 
 	public RefreshToken login(signinRequest signinReq, HttpServletResponse response) {
 		User userDetails = userRepository.findMemberById(signinReq.getUserId());
-       
+       if(userDetails == null) throw new ConflictException(String.format("아이디에 해당하는 회원정보가 없습니다."), ErrorCode.VALIDATION_EXCEPTION);
         checkPassword(signinReq.getUserPw(), userDetails.getUserPw());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUserId(), userDetails.getUserPw());
         String accessToken = jwtTokenProvider.createAccessToken(authentication); // Access Token 발급
