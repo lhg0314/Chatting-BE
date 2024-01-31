@@ -29,6 +29,7 @@ import com.project.chatting.chat.repository.ChatRoomRepository;
 import com.project.chatting.chat.request.ChatReadRequest;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.response.ChatResponse;
+import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
@@ -132,5 +133,10 @@ public class ChatService {
 	}
 
 	// 채팅방 나가기
+
+	// 채팅방 목록 조회
+   	public List<ChatRoomResponse> findAll(String userId) {
+        return chatRepository.selectChatRoomList(userId);
+    }
 
 }
