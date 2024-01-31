@@ -14,6 +14,13 @@ import lombok.Getter;
 @AllArgsConstructor
 @RedisHash(value = "jwtToken", timeToLive = 60 * 60 * 24 * 14)
 public class RefreshToken implements Serializable {
+	
+	public RefreshToken (String id, String accessToken, String refreshToken) {
+		this.id= id;
+		this.accessToken= accessToken;
+		this.refreshToken=refreshToken;
+		this.name="";
+	}
 
     @Id
     private String id;
@@ -22,6 +29,8 @@ public class RefreshToken implements Serializable {
     private String accessToken;
 
     private String refreshToken;
+    
+    private String name;
 
     public void updateAccessToken(String accessToken) {
         this.accessToken = accessToken;
