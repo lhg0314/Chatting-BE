@@ -13,6 +13,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.project.chatting.chat.entity.Chat;
+import com.project.chatting.chat.request.ChatReadRequest;
+import com.project.chatting.chat.request.ChatRequest;
 
 @Configuration
 @EnableRedisRepositories
@@ -46,8 +49,35 @@ public class RedisConfig {
         // 모든 경우
         redisTemplate.setDefaultSerializer(new StringRedisSerializer());
         
+        return redisTemplate;
+    }
+    
+    @Bean
+    public RedisTemplate<String, ChatRequest>redisChatTemplate(RedisConnectionFactory redisConnectionFactory) {
+    	// redisTemplate를 받아와서 set, get, delete를 사용
+        RedisTemplate<String, ChatRequest> redisTemplate = new RedisTemplate<>();
+
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(ChatRequest.class));
+
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatRequest.class));
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+
+        return redisTemplate;
+    }
+    
+    @Bean
+    public RedisTemplate<String, ChatReadRequest>redisChatReadTemplate(RedisConnectionFactory redisConnectionFactory) {
+    	// redisTemplate를 받아와서 set, get, delete를 사용
+        RedisTemplate<String, ChatReadRequest> redisTemplate = new RedisTemplate<>();
+
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(ChatReadRequest.class));
+
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatReadRequest.class));
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
 
         return redisTemplate;
     }

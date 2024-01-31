@@ -5,9 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.repository.ChatRepository;
 import com.project.chatting.chat.repository.ChatRoomRepository;
+import com.project.chatting.chat.request.ChatReadRequest;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
@@ -45,27 +48,65 @@ public class ChatService {
 	@Autowired
   private RedisTemplate<String, Object> redisTemplate;
 	
+	@Autowired
+	  private RedisTemplate<String, ChatRequest> redisChatTemplate;
+	
+	@Autowired
+	private RedisTemplate<String, ChatReadRequest> redisChatReadTemplate;
+	
 	public ChatResponse insertMessage(ChatRequest req) {
 		// 시간 score로 관리하기 위해 숫자로 변환
 		String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 		Long now_long = Long.parseLong(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+		// 현재 시간 set
 		req.setCreateAt(now);
-		req.setReadYn("N");
+		int allMember = chatRepository.getChatMemberCnt(req.getRoomId());
+		int connectMember = chatRoomRepository.getUserCount(req.getUserId()).length;
 		
-		// socket에 연결된 사람이 둘일때만 처리
-		if (chatRoomRepository.getUserCount(Integer.toString(req.getRoomId())) == 2) {
-			req.setReadYn("Y");
-		}
+		// 안읽음 숫자
+		req.setReadCnt(allMember - connectMember);
 		
-        // redis 저장
-		ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+        // redis messageData 저장
+		ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
 		zSetOperations.add("roomId:"+req.getRoomId(), req, now_long);
 		
+		// redis readUserData 저장
+		ZSetOperations<String, ChatReadRequest> zSet2Operations = redisChatReadTemplate.opsForZSet();
+		zSetOperations.add("chatRead:"+req.getRoomId(), req, now_long);
 		
 		//System.out.println(zSetOperations.range("ZKey", 0, -1));
 		ChatResponse res = ChatResponse.toDto(req);
 		
 		return res;
+	}
+	
+	public void get() {
+		List<ChatRequest> li = new ArrayList<>();
+		Set<String> keys = redisTemplate.keys("roomId:*");
+		Iterator<String> it = keys.iterator();
+		
+		while(it.hasNext()) {
+			String data = it.next();
+			
+			ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
+			
+			Set<ChatRequest> list = zSetOperations.range(data, 0, -1);
+
+			list.forEach(li::add);
+			
+			for (int i=0; i < li.size(); i++) {
+				//JSONParser jsonparser = new JSONParser();
+				//Object obj = jsonparser.parse(li.get(i));
+				//JSONObject jsonobj = (JSONObject) obj;
+				
+				//Chat req = mapper.convertValue(jsonobj, Chat.class);
+				System.out.println("::::::SSSSSSSSSSSSSSS"+li.get(i).getClass().getName());
+				
+				//reqList.add(req);
+			
+			}
+
+		}
 	}
 
 	// 채팅방 조회

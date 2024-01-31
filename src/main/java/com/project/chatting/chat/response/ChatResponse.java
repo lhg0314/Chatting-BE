@@ -20,16 +20,16 @@ public class ChatResponse {
 	private String msg;
 	private String msgType;
 	private String createAt;
-	private String readYn;
+	private int readCnt;
 	
 	public static ChatResponse toDto(ChatRequest chatReq) {
 		return ChatResponse.builder()
 				.roomId(chatReq.getRoomId())
 				.userId(chatReq.getUserId())
-				.msg(chatReq.getMsg())
-				.msgType(chatReq.getMsgType())
+				.msg(chatReq.getMessage())
+				.msgType(chatReq.getMessageType())
 				.createAt(chatReq.getCreateAt())
-				.readYn(chatReq.getReadYn())
+				.readCnt(chatReq.getReadCnt())
 				.build();
 				
 	}
@@ -41,7 +41,7 @@ public class ChatResponse {
 				.msg(chat.getMessage())
 				.msgType(chat.getMessageType())
 				.createAt(chat.getCreateAt())
-				.readYn(chat.getReadYn())
+				.readCnt(chat.getReadCnt())
 				.build();
 				
 	}

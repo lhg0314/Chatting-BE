@@ -1,5 +1,7 @@
 package com.project.chatting.chat.request;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,9 +21,11 @@ public class ChatRequest {
 	private int roomId;
 	@NotBlank
 	private String userId;
-	private String msg;
+	private String message;
 	@NotBlank
-	private String msgType;
+	private String messageType;
 	private String createAt;
-	private String readYn;
+	private int readCnt;
+	
+	private String[] users;
 }

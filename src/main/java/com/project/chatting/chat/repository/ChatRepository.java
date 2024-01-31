@@ -16,4 +16,6 @@ public interface ChatRepository {
 	public int setChatRoom(CreateRoomRequest createRoomRequest);
 
 	public void setChatJoin(List<CreateJoinRequest> createJoinRequest);
+	
+	public int getChatMemberCnt(int roomId);
 }

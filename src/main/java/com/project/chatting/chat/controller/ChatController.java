@@ -40,18 +40,17 @@ public class ChatController {
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
 		req.setRoomId(roomId);
-		if (req.getMsgType() == "FILE") {
-			req.setMsg("");
+		if (req.getMessageType() == "FILE") {
+			req.setMessage("");
 		}
 		
 		return ApiResponse.success(chatService.insertMessage(req));
 	}
-//	
-//	@PostMapping(value="/chat/send")
-//	public ApiResponse<ChatResponse> send(@RequestBody ChatRequest req) {
-//
-//		return ApiResponse.success(chatService.insertMessage(req));
-//	}
+	
+	@PostMapping(value="/chat/get")
+	public void send() {
+		chatService.get();
+	}
 
 
 	/**
