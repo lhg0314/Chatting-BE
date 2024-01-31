@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -51,9 +52,6 @@ public class ChatService {
 	@Autowired
 	  private RedisTemplate<String, ChatRequest> redisChatTemplate;
 	
-	@Autowired
-	private RedisTemplate<String, ChatReadRequest> redisChatReadTemplate;
-	
 	public ChatResponse insertMessage(ChatRequest req) {
 		// 시간 score로 관리하기 위해 숫자로 변환
 		String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
@@ -61,18 +59,15 @@ public class ChatService {
 		// 현재 시간 set
 		req.setCreateAt(now);
 		int allMember = chatRepository.getChatMemberCnt(req.getRoomId());
-		int connectMember = chatRoomRepository.getUserCount(req.getUserId()).length;
+		int connectMember = chatRoomRepository.getUserCount(Integer.toString(req.getRoomId())).length;
 		
 		// 안읽음 숫자
 		req.setReadCnt(allMember - connectMember);
+		req.setUsers(Arrays.asList(chatRoomRepository.getUserCount(Integer.toString(req.getRoomId()))));
 		
         // redis messageData 저장
 		ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
 		zSetOperations.add("roomId:"+req.getRoomId(), req, now_long);
-		
-		// redis readUserData 저장
-		ZSetOperations<String, ChatReadRequest> zSet2Operations = redisChatReadTemplate.opsForZSet();
-		zSetOperations.add("chatRead:"+req.getRoomId(), req, now_long);
 		
 		//System.out.println(zSetOperations.range("ZKey", 0, -1));
 		ChatResponse res = ChatResponse.toDto(req);
@@ -80,7 +75,7 @@ public class ChatService {
 		return res;
 	}
 	
-	public void get() {
+	public void setMessages() {
 		List<ChatRequest> li = new ArrayList<>();
 		Set<String> keys = redisTemplate.keys("roomId:*");
 		Iterator<String> it = keys.iterator();
@@ -102,7 +97,8 @@ public class ChatService {
 				//Chat req = mapper.convertValue(jsonobj, Chat.class);
 				System.out.println("::::::SSSSSSSSSSSSSSS"+li.get(i).getClass().getName());
 				
-				//reqList.add(req);
+				chatRepository.setChatMessage(li.get(i));
+				//chatRepository.setChatRead();
 			
 			}
 

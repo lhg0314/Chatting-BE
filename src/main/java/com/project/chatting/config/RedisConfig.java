@@ -67,19 +67,5 @@ public class RedisConfig {
         return redisTemplate;
     }
     
-    @Bean
-    public RedisTemplate<String, ChatReadRequest>redisChatReadTemplate(RedisConnectionFactory redisConnectionFactory) {
-    	// redisTemplate를 받아와서 set, get, delete를 사용
-        RedisTemplate<String, ChatReadRequest> redisTemplate = new RedisTemplate<>();
-
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(ChatReadRequest.class));
-
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatReadRequest.class));
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-
-        return redisTemplate;
-    }
   
 }
