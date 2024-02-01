@@ -80,4 +80,8 @@
 	  SELECT user_id  FROM chatJoin WHERE chatJoin.room_id = #{roomId}
   </select>
   
+  <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat">
+	  SELECT * FROM chatContents WHERE room_id=#{arg0} ORDER BY createAt LIMIT #{arg1} OFFSET #{arg2}
+  </select>
+  
 </mapper>

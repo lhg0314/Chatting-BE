@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
@@ -30,7 +32,7 @@ public class ChatController {
 	
 	@Autowired 
 	private ChatService chatService;
-
+	
 	@MessageMapping("/chat/{roomId}")
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
@@ -85,5 +87,13 @@ public class ChatController {
 		chatRoomList.put("roomList", chatService.findAll(userId));
 
 		return ApiResponse.success(chatRoomList);
+	}
+	
+	@GetMapping("/chat/messageList")
+	public ApiResponse<Map<String, List>> getMessages(@RequestBody ChatListRequest req) {
+		Map<String, List> map = new HashMap<String, List>();
+		map.put("msgList", chatService.getMessageList(req));
+		
+		return ApiResponse.success(map);
 	}
 }
