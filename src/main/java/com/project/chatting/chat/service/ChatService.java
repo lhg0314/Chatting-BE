@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -77,11 +78,12 @@ public class ChatService {
 	}
 	
 	public void setMessages() {
-		List<ChatRequest> li = new ArrayList<>();
 		Set<String> keys = redisTemplate.keys("roomId:*");
 		Iterator<String> it = keys.iterator();
 		
 		while(it.hasNext()) {
+			List<ChatRequest> li = new ArrayList<>();
+			
 			String data = it.next();
 			
 			ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
@@ -89,18 +91,34 @@ public class ChatService {
 			Set<ChatRequest> list = zSetOperations.range(data, 0, -1);
 
 			list.forEach(li::add);
-			
+
 			for (int i=0; i < li.size(); i++) {
-				//JSONParser jsonparser = new JSONParser();
-				//Object obj = jsonparser.parse(li.get(i));
-				//JSONObject jsonobj = (JSONObject) obj;
-				
-				//Chat req = mapper.convertValue(jsonobj, Chat.class);
-				System.out.println("::::::SSSSSSSSSSSSSSS"+li.get(i).getClass().getName());
+				int roomId = li.get(i).getRoomId();
+				String createAt = li.get(i).getCreateAt();
+				String creater = li.get(i).getUserId();
 				
 				chatRepository.setChatMessage(li.get(i));
-				//chatRepository.setChatRead();
-			
+				List<String> ss = chatRepository.getRoomMember(roomId);
+				List<String> us = li.get(i).getUsers();
+				//리스트 합치기
+				List<String> join = Stream.concat(ss.stream(), us.stream())
+						.distinct().collect(Collectors.toList());
+				
+				List<ChatReadRequest> listmap = new ArrayList<>();
+				
+				join.forEach(item -> {
+					Map<String, String> map = new HashMap<String, String>();
+					
+					map.put("creater", creater);
+					map.put("id", item);
+					map.put("yn", us.contains(item) ? "1" : "0");
+					map.put("at", createAt);
+					
+					listmap.add(new ChatReadRequest(roomId, map));
+				});
+
+				chatRepository.setChatRead(listmap);
+				
 			}
 
 		}

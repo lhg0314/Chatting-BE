@@ -22,7 +22,9 @@ public interface ChatRepository {
 
 	public int setChatMessage(ChatRequest req);
 	
-	public int setChatRead(ChatReadRequest req);
+	public int setChatRead(List<ChatReadRequest> req);
 
 	public List<ChatRoomResponse> selectChatRoomList(String userId);
+	
+	public List<String> getRoomMember(int roomId);
 }
