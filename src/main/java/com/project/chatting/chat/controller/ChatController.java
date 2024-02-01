@@ -19,6 +19,7 @@ import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
+import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
@@ -95,5 +96,13 @@ public class ChatController {
 		map.put("msgList", chatService.getMessageList(req));
 		
 		return ApiResponse.success(map);
+
+	/**
+	 * 채팅방 나가기
+	 */
+	@PostMapping("/chat/leave")
+	public ApiResponse<String> leaveChatRoom(@Valid @RequestBody LeaveChatRoomRequest leaveChatRoomRequest){
+		chatService.leaveChatRoom(leaveChatRoomRequest);
+		return ApiResponse.SUCCESS;
 	}
 }
