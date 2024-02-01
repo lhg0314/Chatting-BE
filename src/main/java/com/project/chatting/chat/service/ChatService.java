@@ -168,14 +168,14 @@ public class ChatService {
    		ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
    		int start = req.getCnt() * (req.getPageNum() - 1);
    		int end = req.getCnt() + start - 1;
-   		int limit = req.getCnt() - li.size();
+   		
    		
    		//redis에서 list불러오기
    		Set<ChatRequest> list = zSetOperations.range("roomId:"+req.getRoomId(), start, end);
    		int cntforlist = zSetOperations.range("roomId:"+req.getRoomId(), 0, start + req.getCnt()).size();
    		
 		list.forEach(li::add);
-
+		int limit = req.getCnt() - li.size();
 		if (li.size() == req.getCnt()) {
 			//redis에서 불러온 리스트가 필요한 cnt와 같으면 바로 반환(데이터 모두 존재)
 			li.forEach(item -> {
@@ -193,7 +193,7 @@ public class ChatService {
 			
 			//db조회
 			int offset = limit * (req.getPageNum() - 1);
-			
+			System.out.println(":::::::::::ddddddddddd" + limit+ offset);
 			tempLi = chatRepository.getMessageList(req.getRoomId(), limit, 0);
 			tempLi.forEach(item -> {
 				ChatListResponse resChat = ChatListResponse.toChatDto(item);
