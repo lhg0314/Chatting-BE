@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.repository.ChatRepository;
@@ -35,7 +36,10 @@ import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
+import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
+import com.project.chatting.common.ErrorCode;
+import com.project.chatting.exception.ConflictException;
 import com.project.chatting.user.repository.UserRepository;
 
 
@@ -127,7 +131,7 @@ public class ChatService {
 		}
 	}
 
-	// 채팅방 조회
+	// 채팅방 존재 유무 확인
 	public int existChatRoom(CreateRoomRequest createRoomRequest){
 		createRoomRequest.setUserCount(createRoomRequest.getUserId().size());
 		Collections.sort(createRoomRequest.getUserId());
@@ -135,9 +139,9 @@ public class ChatService {
 		String users = createRoomRequest.getUserId().stream().collect(Collectors.joining(","));
 		System.out.println("Users : " + users);
 
-		String result = chatRepository.findChatRoomByUserId(users); 
+		List<Integer> roomCount = chatRepository.findChatRoomByUserId(users);  
 
-		return result == null ? -1 : Integer.parseInt(result) ;
+		return roomCount == 0 ? -1 : Integer.parseInt(result) ;
 	}
 
 	// 채팅방 생성
@@ -154,6 +158,26 @@ public class ChatService {
 	}
 
 	// 채팅방 나가기
+	@Transactional
+	public void leaveChatRoom(LeaveChatRoomRequest leaveChatRoomRequest){
+
+		// 채팅방 존재하는지 확인
+		if(chatRepository.existChatRoom(leaveChatRoomRequest.getRoomId()) == 0){
+			throw new ConflictException("채팅방이 없습니다.", ErrorCode.CONFLICT_ROOM_EXIST_EXCEPTION);
+		}
+
+		// room_state Y => N 으로 변경
+		chatRepository.setLeaveChatJoin(leaveChatRoomRequest);
+
+		// 참여 인원수 조회
+		int joinUsers = chatRepository.getChatJoinUsers(leaveChatRoomRequest.getRoomId());
+		System.out.println("참여자 인원수 : " + joinUsers);
+
+		// 모두 나갔을 경우 채팅방 삭제
+		if(joinUsers == 0){
+			chatRepository.deleteChatRoom(leaveChatRoomRequest.getRoomId());
+		}
+	}
 
 	// 채팅방 목록 조회
    	public List<ChatRoomResponse> findAll(String userId) {
