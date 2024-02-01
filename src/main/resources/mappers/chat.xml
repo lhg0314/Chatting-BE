@@ -50,13 +50,20 @@
   
   <insert id="setChatMessage" parameterType="com.project.chatting.chat.request.ChatRequest">
 	  INSERT INTO chatContents(room_id, user_id, message, message_type, createAt, readCnt) 
-	  VALUES(#{roomId}, #{userId}, #{message}, #{messageType}, #{createAt}, #{readCnt});
+	  VALUES (#{roomId}, #{userId}, #{message}, #{messageType}, #{createAt}, #{readCnt});
   </insert>
   
-  <insert id="setChatRead" parameterType="com.project.chatting.chat.request.ChatReadRequest">
-	  INSERT INTO chatRead(chat_id, room_id, user_id, read_yn) 
-	  VALUES((SELECT chat_id 
-	  			FROM chatContents WHERE user_id = #{userId} AND createAt = #{createAt}), #{roomId}, #{userId}, #{readYn}); 
+  <insert id="setChatRead" parameterType="java.util.List">
+	  INSERT INTO chatRead(room_id, chat_id, user_id, read_yn) 
+	  VALUES 
+	  <foreach collection="list" item="item" separator=",">
+		  (#{item.roomId},
+			  (SELECT chat_id 
+	  			FROM chatContents WHERE user_id = #{item.readMap.creater} AND createAt = #{item.readMap.at} AND room_id=#{item.roomId}),
+			  #{item.readMap.id}, #{item.readMap.yn}
+		  
+		  )
+	  </foreach> 
   </insert>
 
   <!-- 채팅방 목록 조회 -->
@@ -67,6 +74,10 @@
     WHERE C.room_id IN (SELECT room_id FROM chatJoin WHERE user_id = #{userId})
     AND J.user_id = #{userId}
     AND J.room_state = "Y"
+  </select>
+  
+  <select id="getRoomMember" parameterType="int">
+	  SELECT user_id  FROM chatJoin WHERE chatJoin.room_id = #{roomId}
   </select>
   
 </mapper>

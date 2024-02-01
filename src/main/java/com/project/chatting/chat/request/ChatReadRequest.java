@@ -1,5 +1,7 @@
 package com.project.chatting.chat.request;
 
+import java.util.Map;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,10 +12,15 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatReadRequest {
-	private String roomId;
-	private String userId;
-	private int readYn;
+	private int roomId;
+	private Map<String, String> readMap;
+	
+	public ChatReadRequest() {}
+	
+	public ChatReadRequest(int roomId, Map<String, String> map) {
+
+		this.roomId = roomId;
+		this.readMap = map;
+	}
 }
