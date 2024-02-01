@@ -59,7 +59,7 @@
 	  <foreach collection="list" item="item" separator=",">
 		  (#{item.roomId},
 			  (SELECT chat_id 
-	  			FROM chatContents WHERE user_id = #{item.readMap.creater} AND createAt = #{item.readMap.at}),
+	  			FROM chatContents WHERE user_id = #{item.readMap.creater} AND createAt = #{item.readMap.at} AND room_id=#{item.roomId}),
 			  #{item.readMap.id}, #{item.readMap.yn}
 		  
 		  )

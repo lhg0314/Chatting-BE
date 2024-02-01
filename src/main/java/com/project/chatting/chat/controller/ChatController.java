@@ -42,9 +42,9 @@ public class ChatController {
 		return ApiResponse.success(chatService.insertMessage(req));
 	}
 	
-	@PostMapping(value="/chat/get")
+	@PostMapping(value="/chat/saveMessage")
 	public void send() {
-		chatService.setMessages();
+		chatService.saveMessages();
 	}
 
 

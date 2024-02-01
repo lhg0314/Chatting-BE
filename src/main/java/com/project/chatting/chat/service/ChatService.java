@@ -77,7 +77,7 @@ public class ChatService {
 		return res;
 	}
 	
-	public void setMessages() {
+	public void saveMessages() {
 		Set<String> keys = redisTemplate.keys("roomId:*");
 		Iterator<String> it = keys.iterator();
 		
@@ -118,8 +118,10 @@ public class ChatService {
 				});
 
 				chatRepository.setChatRead(listmap);
-				
 			}
+			
+
+			redisTemplate.delete(data);
 
 		}
 	}
