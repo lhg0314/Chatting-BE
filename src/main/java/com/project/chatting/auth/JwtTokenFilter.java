@@ -153,6 +153,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
                     HttpServletResponse httpResponse = (HttpServletResponse) response;
                     httpResponse.setHeader("Authorization", "Bearer " + newAccessToken);
+                    httpResponse.setHeader("Access-Control-Expose-Headers", "Authorization");
                     HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper(httpRequest){
                         @Override
                         public String getHeader(String name){
