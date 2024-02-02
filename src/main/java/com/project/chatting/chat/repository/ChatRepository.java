@@ -9,13 +9,16 @@ import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.response.ChatListResponse;
+import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.ChatRoomResponse;
+import com.project.chatting.chat.response.CreateRoomResponse;
+import com.project.chatting.chat.response.ExistChatRoomListResponse;
 
 @Mapper
 public interface ChatRepository {
 
 	// public String findChatRoomByUserId(CreateRoomRequest createRoomRequest);
-	public String findChatRoomByUserId(String users);
+	public List<ExistChatRoomListResponse> findChatRoomByUserId(String users);
 
 	public int setChatRoom(CreateRoomRequest createRoomRequest);
 
@@ -32,4 +35,12 @@ public interface ChatRepository {
 	public List<String> getRoomMember(int roomId);
 	
 	public List<Chat> getMessageList(int roomId, int limit, int offset);
+
+	public int existChatRoom(int roomId);
+
+	public void setLeaveChatJoin(LeaveChatRoomRequest leaveChatRoomRequest);
+
+	public int getChatJoinUsers(int roomId);
+
+	public void deleteChatRoom(int roomId);
 }

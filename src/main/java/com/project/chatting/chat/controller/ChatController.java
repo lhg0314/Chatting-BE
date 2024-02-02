@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.response.ChatResponse;
+import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
+import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
@@ -54,29 +56,9 @@ public class ChatController {
 	 * 채팅방 생성
 	 */
 	@PostMapping("/chat/room")
-	public ApiResponse<Integer> createChatRoom(@Valid @RequestBody CreateRoomRequest createRoomRequest) {
-
-		// 채팅방이 존재하는지 확인
-		int roomId = -1;
-		
-		roomId = chatService.existChatRoom(createRoomRequest);
-		if (roomId == -1) {
-			// 채팅방 없음
-			CreateRoomResponse createRoomResponse = chatService.createRoom(createRoomRequest);
-
-			// 채팅방 참여
-			List<CreateJoinRequest> createJoinRequestList = new ArrayList<>();
-			
-			for(String user : createRoomRequest.getUserId()){
-				createJoinRequestList.add(new CreateJoinRequest(user, createRoomResponse.getRoomId(), "Y"));
-			}
-
-			chatService.createJoin(createJoinRequestList);
-
-			roomId = createRoomRequest.getRoomId();
-		}
-
-		return ApiResponse.success(roomId);
+	public ApiResponse<CreateRoomResponse> createChatRoom(@Valid @RequestBody CreateRoomRequest createRoomRequest) {
+		CreateRoomResponse res = chatService.createRoom(createRoomRequest);
+		return ApiResponse.success(res);
 
 	}
 	
@@ -95,5 +77,14 @@ public class ChatController {
 		map.put("msgList", chatService.getMessageList(req));
 		
 		return ApiResponse.success(map);
+	}
+
+	/**
+	 * 채팅방 나가기
+	 */
+	@PostMapping("/chat/leave")
+	public ApiResponse<String> leaveChatRoom(@Valid @RequestBody LeaveChatRoomRequest leaveChatRoomRequest){
+		chatService.leaveChatRoom(leaveChatRoomRequest);
+		return ApiResponse.SUCCESS;
 	}
 }

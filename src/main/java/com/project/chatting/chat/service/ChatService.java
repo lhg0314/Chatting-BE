@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.repository.ChatRepository;
@@ -35,7 +36,11 @@ import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
+import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
+import com.project.chatting.chat.response.ExistChatRoomListResponse;
+import com.project.chatting.common.ErrorCode;
+import com.project.chatting.exception.ConflictException;
 import com.project.chatting.user.repository.UserRepository;
 
 
@@ -127,33 +132,55 @@ public class ChatService {
 		}
 	}
 
-	// 채팅방 조회
-	public int existChatRoom(CreateRoomRequest createRoomRequest){
-		createRoomRequest.setUserCount(createRoomRequest.getUserId().size());
+	// 채팅방 생성
+	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
+
+		// 채팅방 생성 전 이미 존재하는지 확인
 		Collections.sort(createRoomRequest.getUserId());
 
 		String users = createRoomRequest.getUserId().stream().collect(Collectors.joining(","));
 		System.out.println("Users : " + users);
 
-		String result = chatRepository.findChatRoomByUserId(users); 
+		List<ExistChatRoomListResponse> roomList = new ArrayList<>();
+		roomList = chatRepository.findChatRoomByUserId(users);
 
-		return result == null ? -1 : Integer.parseInt(result) ;
-	}
+		if(roomList.size() > 0){
+			return CreateRoomResponse.toDto(-1, true, roomList);
+		}
 
-	// 채팅방 생성
-	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
 		chatRepository.setChatRoom(createRoomRequest);
 		
-		CreateRoomResponse createRoomResponse = CreateRoomResponse.toDto(createRoomRequest.getRoomId());
-		return createRoomResponse;
-	}
+		List<CreateJoinRequest> createJoinRequestList = new ArrayList<>();
+		for(String user : createRoomRequest.getUserId()){
+			createJoinRequestList.add(new CreateJoinRequest(user, createRoomRequest.getRoomId(), "Y"));
+		}
 
-	// 채팅방 참여 생성
-	public void createJoin(List<CreateJoinRequest> createJoinRequest){
-		chatRepository.setChatJoin(createJoinRequest);
+		chatRepository.setChatJoin(createJoinRequestList);
+
+		return CreateRoomResponse.toDto(createRoomRequest.getRoomId(), false, null);
 	}
 
 	// 채팅방 나가기
+	@Transactional
+	public void leaveChatRoom(LeaveChatRoomRequest leaveChatRoomRequest){
+
+		// 채팅방 존재하는지 확인
+		if(chatRepository.existChatRoom(leaveChatRoomRequest.getRoomId()) == 0){
+			throw new ConflictException("채팅방이 없습니다.", ErrorCode.CONFLICT_ROOM_EXIST_EXCEPTION);
+		}
+
+		// room_state Y => N 으로 변경
+		chatRepository.setLeaveChatJoin(leaveChatRoomRequest);
+
+		// 참여 인원수 조회
+		int joinUsers = chatRepository.getChatJoinUsers(leaveChatRoomRequest.getRoomId());
+		System.out.println("참여자 인원수 : " + joinUsers);
+
+		// 모두 나갔을 경우 채팅방 삭제
+		if(joinUsers == 0){
+			chatRepository.deleteChatRoom(leaveChatRoomRequest.getRoomId());
+		}
+	}
 
 	// 채팅방 목록 조회
    	public List<ChatRoomResponse> findAll(String userId) {

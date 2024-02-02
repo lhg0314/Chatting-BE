@@ -5,22 +5,19 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import java.util.List;
 
 @ToString
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateRoomRequest {
+public class LeaveChatRoomRequest {
   
   @NotBlank
-  private String roomName;
+  private String userId;
   
-  private List<@NotBlank String> userId;
-
   private int roomId;
 
+  @NotBlank
+  private String roomState;
 }
