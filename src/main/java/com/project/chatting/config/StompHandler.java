@@ -5,13 +5,17 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 import com.project.chatting.auth.JwtTokenProvider;
+import com.project.chatting.chat.entity.ChatSet;
 import com.project.chatting.chat.repository.ChatRoomRepository;
+import com.project.chatting.chat.request.ChatReadRequest;
+import com.project.chatting.chat.service.ChatSetService;
 import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.TokenException;
 
@@ -28,37 +32,50 @@ public class StompHandler implements ChannelInterceptor {
 	
 	@Autowired
 	private ChatRoomRepository chatRepo;
+	
+	@Autowired
+	private ChatSetService chatsetService;
+	
+
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        
-
-        
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);       
       
         if(accessor.getCommand() == StompCommand.CONNECT) {
-        	System.out.println(accessor);
-        	log.info("CONNECT"); 
-        	// jwt 연동해보기
+        	
+//        	 if(accessor.getNativeHeader("Authorization")!= null) {
+// 	            String accesstoken = accessor.getNativeHeader("Authorization").get(0);
+// 	            jwtTokenProvider.validateAccessToken(accesstoken);
+// 	            
+//             }
+        	
         }else if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
+        	
         	log.info("SUBSCRIBE"); // stompClient.subscribe 실행 시 호출
-        	System.out.println(accessor);
+        	log.info(accessor.toString());
         	String destination = accessor.getDestination();
             int lastIndex = destination.lastIndexOf('/');
             String roomId = destination.substring(lastIndex + 1);
-           
+            String userId = "";
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            String userId = jwtTokenProvider.getUserIdFromToken(accessor.getNativeHeader("Authorization").get(0));
-            chatRepo.setUserEnterInfo(sessionId, roomId,userId);
-            
-            
-            chatRepo.plusUserCount(roomId,userId); // 유저 +1 처리
-            
-            System.out.println("인원수 조회:::::"+Arrays.toString(chatRepo.getUserCount(roomId)));
+            if(accessor.getNativeHeader("Authorization")!= null) {
+	            userId = jwtTokenProvider.getUserIdFromToken(accessor.getNativeHeader("Authorization").get(0));
+	            chatRepo.setUserEnterInfo(sessionId, roomId,userId);	            	            
+	            chatRepo.plusUserCount(roomId,userId); // 유저 +1 처리	            
+	            log.info("인원수 조회:::::"+Arrays.toString(chatRepo.getUserCount(roomId)));
+	           
+	            
+	            ChatSet readReq = new ChatSet(Integer.parseInt(roomId),userId);
+	            
+	            //chatsetService.updateReadYn(readReq); // 해당체팅방 DB메시지 읽음처리
+	            
+	            
+            }
             
             //to-be
-            // 1. 채팅방 입장시 안읽은 메시지 읽은 처리
-            // 2. 입장메시지 필요한가..?
+            // 1. 채팅방 입장시 안읽은 메시지 읽은 처리(DB 완료)
+            // 2. 입장메시지 필요한가..? -> controller에서 처리
             
         }else if(StompCommand.DISCONNECT.equals(accessor.getCommand())){
         	System.out.println(accessor);
