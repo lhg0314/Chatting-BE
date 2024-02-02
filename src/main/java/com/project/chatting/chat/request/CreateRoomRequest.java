@@ -18,11 +18,9 @@ public class CreateRoomRequest {
   
   @NotBlank
   private String roomName;
-
   
   private List<@NotBlank String> userId;
 
   private int roomId;
 
-  private int userCount;
 }

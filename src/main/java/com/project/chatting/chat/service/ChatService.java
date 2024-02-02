@@ -38,6 +38,7 @@ import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
+import com.project.chatting.chat.response.ExistChatRoomListResponse;
 import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.ConflictException;
 import com.project.chatting.user.repository.UserRepository;
@@ -131,30 +132,32 @@ public class ChatService {
 		}
 	}
 
-	// 채팅방 존재 유무 확인
-	public int existChatRoom(CreateRoomRequest createRoomRequest){
-		createRoomRequest.setUserCount(createRoomRequest.getUserId().size());
+	// 채팅방 생성
+	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
+
+		// 채팅방 생성 전 이미 존재하는지 확인
 		Collections.sort(createRoomRequest.getUserId());
 
 		String users = createRoomRequest.getUserId().stream().collect(Collectors.joining(","));
 		System.out.println("Users : " + users);
 
-		List<Integer> roomCount = chatRepository.findChatRoomByUserId(users);  
+		List<ExistChatRoomListResponse> roomList = new ArrayList<>();
+		roomList = chatRepository.findChatRoomByUserId(users);
 
-		return roomCount == 0 ? -1 : Integer.parseInt(result) ;
-	}
+		if(roomList.size() > 0){
+			return CreateRoomResponse.toDto(-1, true, roomList);
+		}
 
-	// 채팅방 생성
-	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
 		chatRepository.setChatRoom(createRoomRequest);
 		
-		CreateRoomResponse createRoomResponse = CreateRoomResponse.toDto(createRoomRequest.getRoomId());
-		return createRoomResponse;
-	}
+		List<CreateJoinRequest> createJoinRequestList = new ArrayList<>();
+		for(String user : createRoomRequest.getUserId()){
+			createJoinRequestList.add(new CreateJoinRequest(user, createRoomRequest.getRoomId(), "Y"));
+		}
 
-	// 채팅방 참여 생성
-	public void createJoin(List<CreateJoinRequest> createJoinRequest){
-		chatRepository.setChatJoin(createJoinRequest);
+		chatRepository.setChatJoin(createJoinRequestList);
+
+		return CreateRoomResponse.toDto(createRoomRequest.getRoomId(), false, null);
 	}
 
 	// 채팅방 나가기
