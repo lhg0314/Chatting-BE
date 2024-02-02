@@ -96,7 +96,8 @@ public class ChatController {
 		map.put("msgList", chatService.getMessageList(req));
 		
 		return ApiResponse.success(map);
-
+	}
+	
 	/**
 	 * 채팅방 나가기
 	 */
