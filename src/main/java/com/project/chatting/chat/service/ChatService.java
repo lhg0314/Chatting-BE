@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.chatting.chat.entity.Chat;
+import com.project.chatting.chat.entity.ChatRead;
 import com.project.chatting.chat.repository.ChatRepository;
 import com.project.chatting.chat.repository.ChatRoomRepository;
 import com.project.chatting.chat.request.ChatListRequest;
@@ -84,31 +85,36 @@ public class ChatService {
 		return res;
 	}
 	
+	@Transactional
 	public void saveMessages() {
 		Set<String> keys = redisTemplate.keys("roomId:*");
 		Iterator<String> it = keys.iterator();
 		
 		while(it.hasNext()) {
-			List<ChatRequest> li = new ArrayList<>();
+			List<ChatRequest> convertedlist = new ArrayList<>();
 			
 			String data = it.next();
 			
 			ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
 			
+			//
+			Long lastDate = Long.parseLong(chatRepository.getMessageList(Integer.parseInt(data.split(":")[1]), 1, 0).get(0).getCreateAt());
+			zSetOperations.removeRangeByScore(data, 0, lastDate);
+			//
 			Set<ChatRequest> list = zSetOperations.range(data, 0, -1);
 
-			list.forEach(li::add);
-
-			for (int i=0; i < li.size(); i++) {
-				int roomId = li.get(i).getRoomId();
-				String createAt = li.get(i).getCreateAt();
-				String creater = li.get(i).getUserId();
+			list.forEach(convertedlist::add);
+			//
+			chatRepository.setChatMessage(convertedlist);
+			for (int i=0; i < convertedlist.size(); i++) {
+				int roomId = convertedlist.get(i).getRoomId();
+				String createAt = convertedlist.get(i).getCreateAt();
+				String creater = convertedlist.get(i).getUserId();
 				
-				chatRepository.setChatMessage(li.get(i));
-				List<String> ss = chatRepository.getRoomMember(roomId);
-				List<String> us = li.get(i).getUsers();
+				List<String> allUsers = chatRepository.getRoomMember(roomId);
+				List<String> savedUsers = convertedlist.get(i).getUsers();
 				//리스트 합치기
-				List<String> join = Stream.concat(ss.stream(), us.stream())
+				List<String> join = Stream.concat(allUsers.stream(), savedUsers.stream())
 						.distinct().collect(Collectors.toList());
 				
 				List<ChatReadRequest> listmap = new ArrayList<>();
@@ -118,12 +124,12 @@ public class ChatService {
 					
 					map.put("creater", creater);
 					map.put("id", item);
-					map.put("yn", us.contains(item) ? "1" : "0");
+					map.put("yn", savedUsers.contains(item) ? "1" : "0");
 					map.put("at", createAt);
 					
 					listmap.add(new ChatReadRequest(roomId, map));
 				});
-
+				
 				chatRepository.setChatRead(listmap);
 			}
 			
@@ -195,50 +201,42 @@ public class ChatService {
    		ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
    		int start = req.getCnt() * (req.getPageNum() - 1);
    		int end = req.getCnt() + start - 1;
+
+   		int listCnt = zSetOperations.reverseRange("roomId:"+req.getRoomId(), start, end).size();
    		
+   		int cntforlist = zSetOperations.reverseRange("roomId:"+req.getRoomId(), 0, -1).size();
+   		int limit = req.getCnt()*2;
+   		int offset = cntforlist - (cntforlist%req.getCnt());
    		
-   		//redis에서 list불러오기
-   		Set<ChatRequest> list = zSetOperations.range("roomId:"+req.getRoomId(), start, end);
-   		int cntforlist = zSetOperations.range("roomId:"+req.getRoomId(), 0, start + req.getCnt()).size();
-   		
-		list.forEach(li::add);
-		int limit = req.getCnt() - li.size();
-		if (li.size() == req.getCnt()) {
-			//redis에서 불러온 리스트가 필요한 cnt와 같으면 바로 반환(데이터 모두 존재)
-			li.forEach(item -> {
-				ChatListResponse resChat = ChatListResponse.toReqDto(item);
-				
-				resList.add(resChat);
-			});
-		}else if (li.size() != req.getCnt() && li.size() != 0) {
-			//redis에서 불러온 리스트가 일부만 있으면 redis + db 조회
-			li.forEach(item -> {
-				ChatListResponse resChat = ChatListResponse.toReqDto(item);
-				
-				resList.add(resChat);
-			});
-			
-			//db조회
-			int offset = limit * (req.getPageNum() - 1);
-			System.out.println(":::::::::::ddddddddddd" + limit+ offset);
-			tempLi = chatRepository.getMessageList(req.getRoomId(), limit, 0);
-			tempLi.forEach(item -> {
-				ChatListResponse resChat = ChatListResponse.toChatDto(item);
-				
-				resList.add(resChat);
-			});
-		}else if (li.size() == 0) {
-			int offset = ((limit * (req.getPageNum() - 1)) - cntforlist);
-			
-			//db에서 조회
+   		if (listCnt != req.getCnt() || listCnt == 0) {
+   			// db에서 조회하여 저장
 			tempLi = chatRepository.getMessageList(req.getRoomId(), limit, offset);
 			tempLi.forEach(item -> {
-				ChatListResponse resChat = ChatListResponse.toChatDto(item);
+				//
+				List<ChatRead> readUsers = chatRepository.getChatMessageUsers(item.getChatId());
+				List<String> userList = new ArrayList<>();
+				readUsers.forEach(user -> {
+					userList.add(user.getUserId());
+					
+				});
 				
-				resList.add(resChat);
+				ChatRequest chatreq = ChatRequest.toDto(item, userList);
+				Long crdate = Long.parseLong(chatreq.getCreateAt());
+				zSetOperations.add("roomId:"+req.getRoomId(), chatreq, crdate);
 			});
-		}
+   		}
    		
+   		//redis에서 list불러오기
+   		Set<ChatRequest> list = zSetOperations.reverseRange("roomId:"+req.getRoomId(), start, end);
+   		
+		list.forEach(li::add);
+		
+		li.forEach(item -> {
+			ChatListResponse resChat = ChatListResponse.toReqDto(item);
+			
+			resList.add(resChat);
+		});
+		
    		return resList;
    	}
 
