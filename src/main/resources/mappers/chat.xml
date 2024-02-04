@@ -62,7 +62,10 @@
   
   <insert id="setChatMessage" parameterType="com.project.chatting.chat.request.ChatRequest">
 	  INSERT INTO chatContents(room_id, user_id, message, message_type, createAt, readCnt) 
-	  VALUES (#{roomId}, #{userId}, #{message}, #{messageType}, #{createAt}, #{readCnt});
+	  VALUES 
+	  <foreach collection="list" item="item" separator=",">
+		  (#{item.roomId}, #{item.userId}, #{item.message}, #{item.messageType}, #{item.createAt}, #{item.readCnt})
+	  </foreach>
   </insert>
   
   <insert id="setChatRead" parameterType="java.util.List">
@@ -72,9 +75,7 @@
 		  (#{item.roomId},
 			  (SELECT chat_id 
 	  			FROM chatContents WHERE user_id = #{item.readMap.creater} AND createAt = #{item.readMap.at} AND room_id=#{item.roomId}),
-			  #{item.readMap.id}, #{item.readMap.yn}
-		  
-		  )
+			  #{item.readMap.id}, #{item.readMap.yn})
 	  </foreach> 
   </insert>
 
@@ -102,7 +103,7 @@
   </select>
   
   <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat">
-	  SELECT * FROM chatContents WHERE room_id=#{arg0} ORDER BY createAt LIMIT #{arg1} OFFSET #{arg2}
+	  SELECT * FROM chatContents WHERE room_id=#{arg0} ORDER BY createAt DESC LIMIT #{arg1} OFFSET #{arg2}
   </select>
   
   <!-- 채팅방 참여 인원수 조회 -->
@@ -114,4 +115,8 @@
   <delete id="deleteChatRoom" parameterType="int">
     DELETE FROM chatRoom WHERE room_id = #{roomId}  
   </delete>
+  
+  <select id="getChatMessageUsers" parameterType="int">
+	  SELECT user_id FROM chatRead WHERE chat_id = #{chatId};
+  </select>
 </mapper>

@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.project.chatting.chat.entity.Chat;
+import com.project.chatting.chat.entity.ChatRead;
 import com.project.chatting.chat.request.ChatReadRequest;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.request.CreateJoinRequest;
@@ -26,7 +27,7 @@ public interface ChatRepository {
 	
 	public int getChatMemberCnt(int roomId);
 
-	public int setChatMessage(ChatRequest req);
+	public int setChatMessage(List<ChatRequest> req);
 	
 	public int setChatRead(List<ChatReadRequest> req);
 
@@ -43,4 +44,6 @@ public interface ChatRepository {
 	public int getChatJoinUsers(int roomId);
 
 	public void deleteChatRoom(int roomId);
+	
+	public List<ChatRead> getChatMessageUsers(int chatId);
 }
