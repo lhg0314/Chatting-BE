@@ -118,6 +118,6 @@
   </delete>
   
   <select id="getChatMessageUsers" parameterType="int">
-	  SELECT user_id FROM chatRead WHERE chat_id = #{chatId};
+	  SELECT user_id FROM chatRead WHERE chat_id = #{chatId} AND read_yn="1";
   </select>
 </mapper>
