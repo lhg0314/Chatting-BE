@@ -217,7 +217,7 @@ public class ChatService {
 
    		int cntforAlllist = zSetOperations.reverseRange("roomId:"+req.getRoomId(), 0, -1).size();
    		int limit = req.getCnt()*2;
-   		int offset = cntforAlllist - (cntforAlllist%req.getCnt());
+   		int offset = cntforAlllist != 0 ? cntforAlllist - (cntforAlllist%req.getCnt()) : 0;
    		
    		if (listCnt != req.getCnt() || listCnt == 0) {
    			// db에서 조회하여 저장
