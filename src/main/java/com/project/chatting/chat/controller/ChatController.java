@@ -51,6 +51,14 @@ public class ChatController {
 		chatService.saveMessages();
 	}
 
+	/**
+	 * 파일 업로드 처리
+	 */
+	// @MessageMapping("/chat/upload/{roomId}")
+	// @SendTo("/sub/room/{roomId}")
+	// public ApiResponse<ChatFileResponse> sendFile(@DestinationVariable(value = "roomId") int roomId, ChatFileRequest ChatFileRequest){
+
+	// }
 
 	/**
 	 * 채팅방 생성
