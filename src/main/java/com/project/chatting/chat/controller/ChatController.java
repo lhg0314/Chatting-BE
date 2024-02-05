@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatRequest;
+import com.project.chatting.chat.response.ChatFileResponse;
 import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.request.CreateJoinRequest;
@@ -57,7 +59,9 @@ public class ChatController {
 	// @MessageMapping("/chat/upload/{roomId}")
 	// @SendTo("/sub/room/{roomId}")
 	// public ApiResponse<ChatFileResponse> sendFile(@DestinationVariable(value = "roomId") int roomId, ChatFileRequest ChatFileRequest){
+	// 	chatService.inserFile(ChatFileRequest);
 
+	// 	return ApiResponse.success(ChatFileResponse.toDto(ChatFileRequest));
 	// }
 
 	/**
