@@ -65,8 +65,8 @@ public class ChatService {
 	@Autowired
 	  private RedisTemplate<String, ChatRequest> redisChatTemplate;
 	
-	@Autowired
-	private RedisTemplate<String, ChatFileRequest> redisChatFileTemplate;
+//	@Autowired
+//	private RedisTemplate<String, ChatFileRequest> redisChatFileTemplate;
 
 	public ChatResponse insertMessage(ChatRequest req) {
 		// 시간 score로 관리하기 위해 숫자로 변환
