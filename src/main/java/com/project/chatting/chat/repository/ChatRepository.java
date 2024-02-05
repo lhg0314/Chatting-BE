@@ -13,13 +13,12 @@ import com.project.chatting.chat.response.ChatListResponse;
 import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.response.CreateRoomResponse;
-import com.project.chatting.chat.response.ExistChatRoomListResponse;
 
 @Mapper
 public interface ChatRepository {
 
 	// public String findChatRoomByUserId(CreateRoomRequest createRoomRequest);
-	public List<ExistChatRoomListResponse> findChatRoomByUserId(String users);
+	public String findChatRoomByUserId(String users);
 
 	public int setChatRoom(CreateRoomRequest createRoomRequest);
 
