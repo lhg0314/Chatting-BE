@@ -203,10 +203,10 @@ public class ChatService {
    		int end = req.getCnt() + start - 1;
 
    		int listCnt = zSetOperations.reverseRange("roomId:"+req.getRoomId(), start, end).size();
-   		
-   		int cntforlist = zSetOperations.reverseRange("roomId:"+req.getRoomId(), 0, -1).size();
+
+   		int cntforAlllist = zSetOperations.reverseRange("roomId:"+req.getRoomId(), 0, -1).size();
    		int limit = req.getCnt()*2;
-   		int offset = cntforlist - (cntforlist%req.getCnt());
+   		int offset = cntforAlllist - (cntforAlllist%req.getCnt());
    		
    		if (listCnt != req.getCnt() || listCnt == 0) {
    			// db에서 조회하여 저장
