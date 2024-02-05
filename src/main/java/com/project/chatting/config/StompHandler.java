@@ -59,6 +59,7 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = destination.substring(lastIndex + 1);
             String userId = "";
             String sessionId = (String) message.getHeaders().get("simpSessionId");
+            
             if(accessor.getNativeHeader("Authorization")!= null) {
 	            userId = jwtTokenProvider.getUserIdFromToken(accessor.getNativeHeader("Authorization").get(0));
 	            chatRepo.setUserEnterInfo(sessionId, roomId,userId);	            	            
@@ -68,7 +69,7 @@ public class StompHandler implements ChannelInterceptor {
 	            
 	            ChatSet readReq = new ChatSet(Integer.parseInt(roomId),userId);
 	            
-	            //chatsetService.updateReadYn(readReq); // 해당체팅방 DB메시지 읽음처리
+	            chatsetService.updateReadYn(readReq); // 해당체팅방 DB메시지 읽음처리
 	            
 	            
             }

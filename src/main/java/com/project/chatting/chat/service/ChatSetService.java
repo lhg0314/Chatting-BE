@@ -1,5 +1,7 @@
 package com.project.chatting.chat.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,17 +51,36 @@ public class ChatSetService {
 		//redis data update
 		updateRedisMessage(readReq.getRoomId(),readReq.getUserId());
 		
-		//chatsetRepo.updateReadYn(readReq); // 해당 체팅방 메시지 모두읽음 처리	
-		//chatsetRepo.updateReadCnt(readReq.getRoomId()); // chatContent테이블 읽지 않은 사람 수 업데이트
+		chatsetRepo.updateReadYn(readReq); // 해당 체팅방 메시지 모두읽음 처리	
+		chatsetRepo.updateReadCnt(readReq.getRoomId()); // chatContent테이블 읽지 않은 사람 수 업데이트
 	}
 	
 	public void updateRedisMessage(int roomId,String userId) {
 		try {
-		  ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
-	        ObjectMapper objectMapper = new ObjectMapper(); // linkedHashMap으로 저장된 redis 값들을 List로 변환해줌
-	        Set<Object> result = zSetOps.reverseRange("roomId:"+roomId, 0, -1);
-	        
-	        System.out.println("조회결과 :::: "+result);
+			
+			Long now_long = Long.parseLong(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+			ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
+	     
+	       
+			List<ChatRequest> chatList = new ArrayList<>();
+	    	Set<ChatRequest> list = zSetOperations.range("roomId:"+roomId, 0, -1);
+
+			list.forEach(chatList::add);
+			
+			System.out.println(chatList);
+			
+			redisTemplate.delete("roomId:"+roomId); // redis에서 기존 채팅방 데이터 삭제
+			
+			for(ChatRequest chat : chatList) {
+				if(!chat.getUsers().contains(userId)) { // 읽은사람 목록에 포함되지 않은 경우
+					chat.getUsers().add(userId);
+					chat.setReadCnt(chat.getReadCnt() -1); // 읽지 않은 인원 -1
+				}
+				
+				zSetOperations.add("roomId:"+roomId, chat, now_long);
+			}
+			
+			
 		}catch(Exception e) {
 			log.error(e.getMessage());
 		}
