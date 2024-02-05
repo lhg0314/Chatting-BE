@@ -12,7 +12,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     
 	@Autowired
-	StompHandler stompHandler;
+	private StompHandler stompHandler;
+	
+	@Autowired
+	 private StompErrorHandler stompErrorHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -25,6 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws") // 엔드포인트 설정
                 .setAllowedOriginPatterns("*") // cors모두 허용
                 .withSockJS();
+        registry.setErrorHandler(stompErrorHandler);
     }
     
     // 소켓 연결시 jwt유효성 검증

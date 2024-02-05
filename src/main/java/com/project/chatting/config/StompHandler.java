@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -44,11 +45,17 @@ public class StompHandler implements ChannelInterceptor {
       
         if(accessor.getCommand() == StompCommand.CONNECT) {
         	
-//        	 if(accessor.getNativeHeader("Authorization")!= null) {
-// 	            String accesstoken = accessor.getNativeHeader("Authorization").get(0);
-// 	            jwtTokenProvider.validateAccessToken(accesstoken);
-// 	            
-//             }
+        	 if(accessor.getNativeHeader("Authorization")!= null) {
+ 	            String accesstoken = accessor.getNativeHeader("Authorization").get(0);
+ 	            try {
+ 	            	jwtTokenProvider.validateAccessToken(accesstoken);
+ 	            }catch(Exception e) {
+ 	            	 throw new MessageDeliveryException("UNAUTHORIZED");
+ 	            }
+             }else {
+            	 throw new MessageDeliveryException("UNAUTHORIZED");
+            	 
+             }
         	
         }else if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
         	
