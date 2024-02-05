@@ -38,7 +38,6 @@ import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
-import com.project.chatting.chat.response.ExistChatRoomListResponse;
 import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.ConflictException;
 import com.project.chatting.user.repository.UserRepository;
@@ -135,21 +134,26 @@ public class ChatService {
 	// 채팅방 생성
 	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
 
-		// 채팅방 생성 전 이미 존재하는지 확인
-		Collections.sort(createRoomRequest.getUserId());
+		// 1:1 인지 그룹 인지 먼저 체크
+		if(createRoomRequest.getUserId().size() == 2){
+			// 1:1 채팅방 로직
 
-		String users = createRoomRequest.getUserId().stream().collect(Collectors.joining(","));
-		System.out.println("Users : " + users);
+			// 이미 존재하는 방인지 체크 필요
+			Collections.sort(createRoomRequest.getUserId());
+			String users = createRoomRequest.getUserId().stream().collect(Collectors.joining(","));
+			System.out.println("Users : " + users);
 
-		List<ExistChatRoomListResponse> roomList = new ArrayList<>();
-		roomList = chatRepository.findChatRoomByUserId(users);
+			String roomId = chatRepository.findChatRoomByUserId(users);
 
-		if(roomList.size() > 0){
-			return CreateRoomResponse.toDto(-1, true, roomList);
+			if(roomId != null){
+				// 채팅방 존재 
+				return CreateRoomResponse.toDto(Integer.parseInt(roomId), true);
+			}
 		}
 
+		// 채팅방 생성 로직
 		chatRepository.setChatRoom(createRoomRequest);
-		
+
 		List<CreateJoinRequest> createJoinRequestList = new ArrayList<>();
 		for(String user : createRoomRequest.getUserId()){
 			createJoinRequestList.add(new CreateJoinRequest(user, createRoomRequest.getRoomId(), "Y"));
@@ -157,7 +161,7 @@ public class ChatService {
 
 		chatRepository.setChatJoin(createJoinRequestList);
 
-		return CreateRoomResponse.toDto(createRoomRequest.getRoomId(), false, null);
+		return CreateRoomResponse.toDto(createRoomRequest.getRoomId(), false);
 	}
 
 	// 채팅방 나가기

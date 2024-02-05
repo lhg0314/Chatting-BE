@@ -19,22 +19,23 @@
   </select> -->
   <select id="findChatRoomByUserId" parameterType="string">
     SELECT 
-      a.room_id, cr.room_name, a.userNames
-    FROM
-      (
-        SELECT 
-          GROUP_CONCAT(cj.user_id ORDER BY cj.user_id ASC) users,
-          GROUP_CONCAT(user_name ORDER BY cj.user_id ASC) userNames,
-          room_id
-        FROM
-          chatJoin cj 
-        JOIN user u
-        ON cj.user_id = u.user_id
-        WHERE room_state = "Y" GROUP BY room_id
-      ) a
-    JOIN chatRoom cr
+      a.room_id
+    FROM 
+      (SELECT 
+        COUNT(*) userCount,
+        GROUP_CONCAT(cj.user_id ORDER BY cj.user_id ASC) users, 
+        GROUP_CONCAT(cj.room_state) userStates,
+        room_id 
+      FROM 
+        chatJoin cj 
+      JOIN 
+        user u 
+      ON cj.user_id = u.user_id
+      GROUP BY room_id
+      HAVING userCount = 2) a
+    JOIN chatRoom cr 
     ON a.room_id = cr.room_id
-    WHERE a.users = #{users}
+    WHERE a.users = #{users} AND a.userStates = ("Y,Y");
   </select>
 
 
