@@ -204,6 +204,7 @@ User userDetails = userRepository.findMemberById(signinReq.getUserId());
         registry.addEndpoint("/ws") // 엔드포인트 설정
                 .setAllowedOriginPatterns("*") // cors모두 허용
                 .withSockJS();
+        registry.setErrorHandler(stompErrorHandler);
     }
     
     // 소켓 연결시 jwt유효성 검증
@@ -216,6 +217,90 @@ User userDetails = userRepository.findMemberById(signinReq.getUserId());
 ```
 
 #### stompHandler
+
+>websocket stomp로 연결하는 흐름을 제어하는 interceptor, jwt인증 / 채팅방 입장인원 관리 / 읽음처리 구현을위해 사용
+
+##### CONNECT
+
+ > stompClient.connect 함수 실행 시 수행 , jwt인증 수행
+
+---
+
+```
+
+if(accessor.getNativeHeader("Authorization")!= null) {
+    String accesstoken = accessor.getNativeHeader("Authorization").get(0);
+    try {
+        jwtTokenProvider.validateAccessToken(accesstoken);
+    }catch(Exception e) {
+            throw new MessageDeliveryException("UNAUTHORIZED");
+    }
+    }else {
+        throw new MessageDeliveryException("UNAUTHORIZED");
+        
+    }
+}
+```
+
+
+
+
+##### SUBSCRIBE
+
+ > stompClient.subscribe 함수 실행 시 수행 > 채팅방에 입장한 유저 +1 처리 / 채팅방입장 시 채팅 읽음처리 
+
+---
+
+
+```
+if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
+        	
+    String destination = accessor.getDestination();
+    int lastIndex = destination.lastIndexOf('/');
+    String roomId = destination.substring(lastIndex + 1);
+    String userId = "";
+    String sessionId = (String) message.getHeaders().get("simpSessionId");
+    
+    if(accessor.getNativeHeader("Authorization")!= null) {
+        userId = jwtTokenProvider.getUserIdFromToken(accessor.getNativeHeader("Authorization").get(0));
+        chatRepo.setUserEnterInfo(sessionId, roomId,userId);	            	            
+        chatRepo.plusUserCount(roomId,userId); // 유저 +1 처리	            
+      
+        ChatSet readReq = new ChatSet(Integer.parseInt(roomId),userId);
+        
+        chatsetService.updateReadYn(readReq); 
+        
+        
+    }
+```
+
+##### DISCONNECT
+
+> stompClient.disconnect 함수 실행 혹은 채팅방 벗어났을 시 수행 > 채팅방에 입장한 유저 -1처리
+
+---
+
+```
+if(StompCommand.DISCONNECT.equals(accessor.getCommand())){
+ 
+    String sessionId = (String) message.getHeaders().get("simpSessionId");
+    String roomaAndUserInfo = chatRepo.getUserEnterRoomId(sessionId);
+    int index = 0;
+    String roomId = "";
+    String userId = "";
+    if(roomaAndUserInfo != null) {
+        index = roomaAndUserInfo.indexOf("/");
+            roomId = roomaAndUserInfo.substring(0, index);
+            userId = roomaAndUserInfo.substring(index+1);
+            chatRepo.minusUserCount(roomId, userId);
+    }
+    
+    
+    chatRepo.removeUserEnterInfo(sessionId); // 세션 정보 삭제
+}
+```
+
+
 
  - [stompHandler](http://git.openobject.net:8880/education/chatting-server/-/blob/main/src/main/java/com/project/chatting/config/StompHandler.java)
 
