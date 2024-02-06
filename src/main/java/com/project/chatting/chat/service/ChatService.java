@@ -65,8 +65,8 @@ public class ChatService {
 	@Autowired
 	  private RedisTemplate<String, ChatRequest> redisChatTemplate;
 	
-	//@Autowired
-	//private RedisTemplate<String, ChatFileRequest> redisChatFileTemplate;
+	@Autowired
+	private RedisTemplate<String, ChatFileRequest> redisChatFileTemplate;
 
 	@Transactional
 	public ChatResponse insertMessage(ChatRequest req) {
