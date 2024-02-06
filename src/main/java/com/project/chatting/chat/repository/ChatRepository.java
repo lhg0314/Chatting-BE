@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.entity.ChatRead;
 import com.project.chatting.chat.request.ChatFileRequest;
+import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatReadRequest;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.chat.request.CreateJoinRequest;
