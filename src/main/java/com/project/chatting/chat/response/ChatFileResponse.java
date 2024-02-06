@@ -1,6 +1,5 @@
 package com.project.chatting.chat.response;
 
-import com.project.chatting.chat.request.ChatFileRequest;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,26 +9,16 @@ import lombok.ToString;
 @Getter
 @Builder
 public class ChatFileResponse {
-    private int roomId;
-    private String userId;
-    private String message;
-    private String messageType;
-    private String createAt;
-    private int readCnt;
-    private String imageCode;
-    private String imageName;
 
+    private int chatId;
+    private String fileName;
+    private String fileUrl;
 
-    public static ChatFileResponse toDto(ChatFileRequest chatFileRequest){
+    public static ChatFileResponse toDto(int chatId, String fileName, String fileUrl){
         return ChatFileResponse.builder()
-            .roomId(chatFileRequest.getRoomId())
-            .userId(chatFileRequest.getUserId())
-            .message(chatFileRequest.getMessage())
-            .messageType(chatFileRequest.getMessageType())
-            .createAt(chatFileRequest.getCreateAt())
-            .readCnt(chatFileRequest.getReadCnt())
-            .imageCode(chatFileRequest.getImageCode())
-            .imageName(chatFileRequest.getImageName())
+            .chatId(chatId)
+            .fileName(fileName)
+            .fileUrl(fileUrl)
             .build();
     }
 }

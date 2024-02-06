@@ -119,4 +119,10 @@
   <select id="getChatMessageUsers" parameterType="int">
 	  SELECT user_id FROM chatRead WHERE chat_id = #{chatId} AND read_yn="1";
   </select>
+
+  <!-- 이미지 파일 저장 -->
+  <insert id="setFile" parameterType="com.project.chatting.chat.request.ChatFileRequest">
+    INSERT INTO file (chat_id, file_name, file_ext, file_url)
+    VALUES (#{chatId}, #{fileName}, #{fileExt}, #{fileUrl})
+  </insert>
 </mapper>
