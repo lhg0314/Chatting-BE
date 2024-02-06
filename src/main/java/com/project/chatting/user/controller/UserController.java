@@ -2,7 +2,6 @@ package com.project.chatting.user.controller;
 
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.project.chatting.auth.RefreshToken;
 import com.project.chatting.common.ApiResponse;
 import com.project.chatting.user.entity.User;
@@ -21,6 +19,10 @@ import com.project.chatting.user.request.SignupRequest;
 import com.project.chatting.user.request.signinRequest;
 import com.project.chatting.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -41,6 +43,11 @@ public class UserController {
 	 * 사용자등록
 	 * @throws Exception 
 	 */
+	@Operation(summary = "회원가입")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",description = "OK, 회원가입 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "C007",description = "아이디 중복"),
+    })
 	@PostMapping("/auth/signup")
 	public ApiResponse<String> registerUser(@Valid @RequestBody SignupRequest signUpReq) {
 	
@@ -57,6 +64,13 @@ public class UserController {
 	 * 로그인 처리 - 추후 만들예정
 	 * @throws Exception 
 	 */
+	
+	@Operation(summary = "로그인")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",description = "OK, 로그인 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "Error Code",description = "Error message",
+                    content = @Content(schema = @Schema(implementation = RefreshToken.class))),
+    })
 	@PostMapping("/auth/signin")
 	public ApiResponse<RefreshToken> loginUser(@Valid @RequestBody signinRequest signinReq, HttpServletResponse response){
 		System.out.println("UserInfo" + signinReq);
