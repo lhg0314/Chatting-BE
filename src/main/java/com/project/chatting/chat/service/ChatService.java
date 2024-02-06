@@ -103,6 +103,59 @@ public class ChatService {
 		return res;
 	}
 	
+	@Transactional 
+	public void saveMessages() {
+		Set<String> keys = redisTemplate.keys("roomId:*");
+		Iterator<String> it = keys.iterator();
+		
+		while(it.hasNext()) {
+			List<ChatRequest> convertedlist = new ArrayList<>();
+			
+			String data = it.next();
+			
+			ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
+			
+			//
+			Long lastDate = Long.parseLong(chatRepository.getMessageList(Integer.parseInt(data.split(":")[1]), 1, 0).get(0).getCreateAt());
+			zSetOperations.removeRangeByScore(data, 0, lastDate);
+			//
+			Set<ChatRequest> list = zSetOperations.range(data, 0, -1);
+
+			list.forEach(convertedlist::add);
+			//
+			chatRepository.setChatMessage(convertedlist);
+			for (int i=0; i < convertedlist.size(); i++) {
+				int roomId = convertedlist.get(i).getRoomId();
+				String createAt = convertedlist.get(i).getCreateAt();
+				String creater = convertedlist.get(i).getUserId();
+				
+				List<String> allUsers = chatRepository.getRoomMember(roomId);
+				List<String> savedUsers = convertedlist.get(i).getUsers();
+				//리스트 합치기
+				List<String> join = Stream.concat(allUsers.stream(), savedUsers.stream())
+						.distinct().collect(Collectors.toList());
+				
+				List<ChatReadRequest> listmap = new ArrayList<>();
+				
+				join.forEach(item -> {
+					Map<String, String> map = new HashMap<String, String>();
+					
+					map.put("creater", creater);
+					map.put("id", item);
+					map.put("yn", savedUsers.contains(item) ? "1" : "0");
+					map.put("at", createAt);
+					
+					listmap.add(new ChatReadRequest(roomId, map));
+				});
+				
+				chatRepository.setChatRead(listmap);
+			}
+			
+			redisTemplate.delete(data);
+
+		}
+	}
+
 	// 채팅방 생성
 	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
 
