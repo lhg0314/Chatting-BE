@@ -100,8 +100,10 @@
 	  SELECT user_id  FROM chatJoin WHERE chatJoin.room_id = #{roomId}
   </select>
   
-  <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat">
-	  SELECT * FROM chatContents WHERE room_id=#{arg0} ORDER BY createAt DESC LIMIT #{arg1} OFFSET #{arg2}
+  <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat" parameterType="com.project.chatting.chat.request.ChatListRequest">
+	  SELECT * FROM chatContents 
+	  WHERE room_id=#{roomId} AND chat_id <![CDATA[<=]]> #{chatId}
+	  ORDER BY createAt DESC LIMIT #{cnt}
   </select>
   
   <!-- 채팅방 참여 인원수 조회 -->

@@ -82,7 +82,7 @@ public class ChatService {
 		// 안읽음 숫자
 		req.setReadCnt(allMember - connectMember);
 		req.setUsers(connectUsers);
-
+		
 		chatRepository.setChatMessage(req); //채팅 내용 insert
 		
 		List<String> joinList = Stream.concat(allUsers.stream(), connectUsers.stream())
@@ -100,6 +100,15 @@ public class ChatService {
 		});
 		
 		chatRepository.setChatRead(listmap); //채팅 읽음 insert
+		
+		// 메시지 타입별 db insert
+		if (req.getMessageType() == "FILE") {
+			// 파일 업로드 함수 호출
+		} else if (req.getMessageType() == "EXIT"){
+			// 채팅방 삭제 함수 호출
+			// 삭제한 유저 id, 나갔습니다 메시지 추가하여 반환
+		}
+		//
 		
 		ChatResponse res = ChatResponse.toDto(req);
 		
@@ -171,45 +180,18 @@ public class ChatService {
    		List<ChatRequest> li = new ArrayList<>();
    		List<Chat> tempLi = new ArrayList<>();
    		
-   		ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
-   		int start = req.getCnt() * (req.getPageNum() - 1);
-   		int end = req.getCnt() + start - 1;
-
-   		int listCnt = zSetOperations.reverseRange("roomId:"+req.getRoomId(), start, end).size();
-
-   		int cntforAlllist = zSetOperations.reverseRange("roomId:"+req.getRoomId(), 0, -1).size();
-   		int limit = req.getCnt()*2;
-   		int offset = cntforAlllist != 0 ? cntforAlllist - (cntforAlllist%req.getCnt()) : 0;
-   		
-   		if (listCnt != req.getCnt() || listCnt == 0) {
-   			// db에서 조회하여 저장
-			tempLi = chatRepository.getMessageList(req.getRoomId(), limit, offset);
-			tempLi.forEach(item -> {
-				//
-				List<ChatRead> readUsers = chatRepository.getChatMessageUsers(item.getChatId());
-				List<String> userList = new ArrayList<>();
-				readUsers.forEach(user -> {
-					userList.add(user.getUserId());
-					
-				});
-				
-				ChatRequest chatreq = ChatRequest.toDto(item, userList);
-				Long crdate = Long.parseLong(chatreq.getCreateAt());
-				zSetOperations.add("roomId:"+req.getRoomId(), chatreq, crdate);
+		tempLi = chatRepository.getMessageList(req);
+		tempLi.forEach(item -> {
+			List<ChatRead> readUsers = chatRepository.getChatMessageUsers(item.getChatId());
+			List<String> userList = new ArrayList<>();
+			readUsers.forEach(user -> {
+				userList.add(user.getUserId());
 			});
-   		}
-   		
-   		//redis에서 list불러오기
-   		Set<ChatRequest> list = zSetOperations.reverseRange("roomId:"+req.getRoomId(), start, end);
-   		
-		list.forEach(li::add);
-		
-		li.forEach(item -> {
-			ChatListResponse resChat = ChatListResponse.toReqDto(item);
+			ChatListResponse resChat = ChatListResponse.toChatDto(item);
+			resChat.setUsers(userList);
 			
 			resList.add(resChat);
 		});
-		
    		return resList;
    	}
 
