@@ -32,6 +32,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class SecurityConfiguration{
 	
+	private final String[] swaggerPath = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/error"};
+	
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
 	
@@ -86,6 +88,7 @@ public class SecurityConfiguration{
             	      "/**.html",
             	      "/**.js"
             ).permitAll()
+            .requestMatchers(swaggerPath).permitAll()
             // 그 외는 인증 필요
             .anyRequest().authenticated())
           // jwt filter 추가
