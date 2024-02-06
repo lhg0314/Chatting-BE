@@ -35,7 +35,7 @@ public interface ChatRepository {
 	
 	public List<String> getRoomMember(int roomId);
 	
-	public List<Chat> getMessageList(int roomId, int limit, int offset);
+	public List<Chat> getMessageList(ChatListRequest req);
 
 	public int existChatRoom(int roomId);
 

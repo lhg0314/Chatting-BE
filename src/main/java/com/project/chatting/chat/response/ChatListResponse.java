@@ -1,25 +1,35 @@
 package com.project.chatting.chat.response;
 
+import java.util.List;
+
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.request.ChatRequest;
 import com.project.chatting.user.response.UserListResponse;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @ToString
 @Getter
+@Setter
 @Builder
 public class ChatListResponse {
+	private int chatId;
 	private String userId;
 	private String msg;
 	private String msgType;
 	private String createAt;
 	private int readCnt;
+	private List<String> users;
+	private String nextYn;
+	private int nowPage;
+	private int allPage; //서버만 알고있을거면 삭제
 	
 	public static ChatListResponse toChatDto(Chat chat) {
 		return ChatListResponse.builder()
+				.chatId(chat.getChatId())
 				.userId(chat.getUserId())
 				.msg(chat.getMessage())
 				.msgType(chat.getMessageType())

@@ -18,6 +18,6 @@ import lombok.ToString;
 public class ChatListRequest {
 	@NotBlank
 	private int roomId;
-	private int pageNum;
+	private int chatId;
 	private int cnt;
 }

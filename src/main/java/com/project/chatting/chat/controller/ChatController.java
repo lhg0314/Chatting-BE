@@ -41,9 +41,6 @@ public class ChatController {
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
 		req.setRoomId(roomId);
-		if (req.getMessageType() == "FILE") {
-			req.setMessage("");
-		}
 		
 		return ApiResponse.success(chatService.insertMessage(req));
 	}
