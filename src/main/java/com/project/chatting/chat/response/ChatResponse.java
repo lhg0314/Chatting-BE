@@ -2,6 +2,7 @@ package com.project.chatting.chat.response;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.request.ChatRequest;
@@ -21,6 +22,7 @@ public class ChatResponse {
 	private String msgType;
 	private String createAt;
 	private int readCnt;
+	private List<String> users;
 	
 	public static ChatResponse toDto(ChatRequest chatReq) {
 		return ChatResponse.builder()
@@ -30,6 +32,7 @@ public class ChatResponse {
 				.msgType(chatReq.getMessageType())
 				.createAt(chatReq.getCreateAt())
 				.readCnt(chatReq.getReadCnt())
+				.users(chatReq.getUsers())
 				.build();
 				
 	}

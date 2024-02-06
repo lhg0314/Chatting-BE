@@ -63,10 +63,7 @@
   
   <insert id="setChatMessage" parameterType="com.project.chatting.chat.request.ChatRequest">
 	  INSERT INTO chatContents(room_id, user_id, message, message_type, createAt, readCnt) 
-	  VALUES 
-	  <foreach collection="list" item="item" separator=",">
-		  (#{item.roomId}, #{item.userId}, #{item.message}, #{item.messageType}, #{item.createAt}, #{item.readCnt})
-	  </foreach>
+	  VALUES (#{roomId}, #{userId}, #{message}, #{messageType}, #{createAt}, #{readCnt})
   </insert>
   
   <insert id="setChatRead" parameterType="java.util.List">
