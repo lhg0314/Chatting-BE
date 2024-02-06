@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,9 +30,11 @@ import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.entity.ChatRead;
 import com.project.chatting.chat.repository.ChatRepository;
 import com.project.chatting.chat.repository.ChatRoomRepository;
+import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatReadRequest;
 import com.project.chatting.chat.request.ChatRequest;
+import com.project.chatting.chat.response.ChatFileResponse;
 import com.project.chatting.chat.response.ChatListResponse;
 import com.project.chatting.chat.response.ChatResponse;
 import com.project.chatting.chat.response.ChatRoomResponse;
@@ -103,59 +106,6 @@ public class ChatService {
 		return res;
 	}
 	
-	@Transactional 
-	public void saveMessages() {
-		Set<String> keys = redisTemplate.keys("roomId:*");
-		Iterator<String> it = keys.iterator();
-		
-		while(it.hasNext()) {
-			List<ChatRequest> convertedlist = new ArrayList<>();
-			
-			String data = it.next();
-			
-			ZSetOperations<String, ChatRequest> zSetOperations = redisChatTemplate.opsForZSet();
-			
-			//
-			Long lastDate = Long.parseLong(chatRepository.getMessageList(Integer.parseInt(data.split(":")[1]), 1, 0).get(0).getCreateAt());
-			zSetOperations.removeRangeByScore(data, 0, lastDate);
-			//
-			Set<ChatRequest> list = zSetOperations.range(data, 0, -1);
-
-			list.forEach(convertedlist::add);
-			//
-			chatRepository.setChatMessage(convertedlist);
-			for (int i=0; i < convertedlist.size(); i++) {
-				int roomId = convertedlist.get(i).getRoomId();
-				String createAt = convertedlist.get(i).getCreateAt();
-				String creater = convertedlist.get(i).getUserId();
-				
-				List<String> allUsers = chatRepository.getRoomMember(roomId);
-				List<String> savedUsers = convertedlist.get(i).getUsers();
-				//리스트 합치기
-				List<String> join = Stream.concat(allUsers.stream(), savedUsers.stream())
-						.distinct().collect(Collectors.toList());
-				
-				List<ChatReadRequest> listmap = new ArrayList<>();
-				
-				join.forEach(item -> {
-					Map<String, String> map = new HashMap<String, String>();
-					
-					map.put("creater", creater);
-					map.put("id", item);
-					map.put("yn", savedUsers.contains(item) ? "1" : "0");
-					map.put("at", createAt);
-					
-					listmap.add(new ChatReadRequest(roomId, map));
-				});
-				
-				chatRepository.setChatRead(listmap);
-			}
-			
-			redisTemplate.delete(data);
-
-		}
-	}
-
 	// 채팅방 생성
 	public CreateRoomResponse createRoom(CreateRoomRequest createRoomRequest){
 
@@ -262,4 +212,54 @@ public class ChatService {
 		
    		return resList;
    	}
+
+	/**
+	 * redis 파일 전송
+	 */
+	// public ChatFileResponse inserFile(ChatFileRequest chatFileRequest){
+	// 	// 시간 score로 관리하기 위해 숫자로 변환
+	// 	String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+	// 	Long now_long = Long.parseLong(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+	// 	// 현재 시간 set
+	// 	chatFileRequest.setCreateAt(now);
+
+	// 	int allMember = chatRepository.getChatMemberCnt(chatFileRequest.getRoomId());
+	// 	int connectMember = chatRoomRepository.getUserCount(Integer.toString(chatFileRequest.getRoomId())).length;
+		
+	// 	// 안읽음 숫자
+	// 	chatFileRequest.setReadCnt(allMember - connectMember);
+	// 	//req.setUsers(Arrays.asList(chatRoomRepository.getUserCount(Integer.toString(req.getRoomId()))));
+		
+
+	// 	// redis에 저장전에 base64로 인코딩된 문자열을 가공
+	// 	try{
+	// 		String[] strings = chatFileRequest.getImageCode().split(",");
+	// 		String base64Image = strings[1];
+	// 		String ext = "";
+
+	// 		if(strings[0].equals("data:image/jpeg;base64")){
+	// 			ext = "jpeg";
+	// 		}else if(strings[0].equals("data:image/png;base64")){
+	// 			ext = "png";
+	// 		}else{
+	// 			ext = "jpg";
+	// 		}
+
+	// 		byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+	// 		System.out.println("디코딩된 이미지 바이트 값 : " + imageBytes);
+	// 	}catch(Exception e){
+	// 		System.out.println("Error");
+	// 	}
+
+
+    //     // redis messageData 저장
+	// 	ZSetOperations<String, ChatFileRequest> zSetOperations = redisChatFileTemplate.opsForZSet();
+	// 	zSetOperations.add("roomId(file):"+chatFileRequest.getRoomId(), chatFileRequest, now_long);
+		
+	// 	//System.out.println(zSetOper  ations.range("ZKey", 0, -1));
+	// 	ChatFileResponse chatFileResponse = ChatFileResponse.toDto(chatFileRequest);
+		
+	// 	return chatFileResponse;
+	// }
+
 }
