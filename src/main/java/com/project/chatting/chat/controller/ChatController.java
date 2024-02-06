@@ -48,11 +48,6 @@ public class ChatController {
 		return ApiResponse.success(chatService.insertMessage(req));
 	}
 	
-	@PostMapping(value="/chat/saveMessage")
-	public void send() {
-		chatService.saveMessages();
-	}
-
 	/**
 	 * 파일 업로드 처리
 	 */
@@ -83,7 +78,7 @@ public class ChatController {
 		return ApiResponse.success(chatRoomList);
 	}
 	
-	@GetMapping("/chat/messageList")
+	@PostMapping("/chat/messageList")
 	public ApiResponse<Map<String, List>> getMessages(@RequestBody ChatListRequest req) {
 		Map<String, List> map = new HashMap<String, List>();
 		map.put("msgList", chatService.getMessageList(req));

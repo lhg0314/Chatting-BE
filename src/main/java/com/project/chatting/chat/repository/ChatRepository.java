@@ -26,7 +26,7 @@ public interface ChatRepository {
 	
 	public int getChatMemberCnt(int roomId);
 
-	public int setChatMessage(List<ChatRequest> req);
+	public int setChatMessage(ChatRequest req);
 	
 	public int setChatRead(List<ChatReadRequest> req);
 
