@@ -184,9 +184,8 @@ public class ChatService {
    		List<Chat> tempLi = new ArrayList<>();
    		
    		tempLi = chatRepository.getMessageList(req);
-   		req.setChatId(req.getChatId() != 0 ? req.getChatId() - req.getCnt() : req.getChatId());
+   		
 		int nextYn = chatRepository.getNextDataYn(req);
-		
 		tempLi.forEach(item -> {
 			List<ChatRead> readUsers = chatRepository.getChatMessageUsers(item.getChatId());
 			List<String> userList = new ArrayList<>();
