@@ -48,8 +48,8 @@ public class ChatSetService {
 	@Transactional
 	public void updateReadYn (ChatSet readReq) {
 		
-		//redis data update
-		updateRedisMessage(readReq.getRoomId(),readReq.getUserId());
+		//redis data update 안쓰기로 정해서 주석처리
+		//updateRedisMessage(readReq.getRoomId(),readReq.getUserId());
 		
 		chatsetRepo.updateReadYn(readReq); // 해당 체팅방 메시지 모두읽음 처리	
 		chatsetRepo.updateReadCnt(readReq.getRoomId()); // chatContent테이블 읽지 않은 사람 수 업데이트
