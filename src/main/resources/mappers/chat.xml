@@ -133,12 +133,8 @@
 	  SELECT EXISTS (SELECT 1 FROM chatting_program.chatContents 
 		WHERE room_id=#{roomId}
 		<if test="chatId != 0">
-			AND chat_id <![CDATA[<]]> #{chatId}
+			AND chat_id <![CDATA[>]]> #{chatId}
 		</if>
-		ORDER BY createAt DESC LIMIT 1
-		<if test="chatId == 0">
-			OFFSET #{cnt}
-		</if>
-		) AS yn
+		ORDER BY createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
   </select>
 </mapper>
