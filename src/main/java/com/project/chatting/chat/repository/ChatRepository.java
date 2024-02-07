@@ -49,4 +49,6 @@ public interface ChatRepository {
 	public List<ChatRead> getChatMessageUsers(int chatId);
 
 	public void setFile(ChatFileRequest chatFileRequest);
+	
+	public int getNextDataYn(ChatListRequest req);
 }

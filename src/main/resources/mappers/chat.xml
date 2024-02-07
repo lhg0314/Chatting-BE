@@ -102,7 +102,10 @@
   
   <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat" parameterType="com.project.chatting.chat.request.ChatListRequest">
 	  SELECT * FROM chatContents 
-	  WHERE room_id=#{roomId} AND chat_id <![CDATA[<=]]> #{chatId}
+	  WHERE room_id=#{roomId}
+	  <if test="chatId != 0">
+		  AND chat_id <![CDATA[<]]> #{chatId}
+	  </if>
 	  ORDER BY createAt DESC LIMIT #{cnt}
   </select>
   
@@ -125,4 +128,13 @@
     INSERT INTO file (chat_id, file_name, file_ext, file_url)
     VALUES (#{chatId}, #{fileName}, #{fileExt}, #{fileUrl})
   </insert>
+  
+  <select id="getNextDataYn" resultType="int">
+	  SELECT EXISTS (SELECT 1 FROM chatting_program.chatContents 
+		WHERE room_id=#{roomId}
+		<if test="chatId != 0">
+			AND chat_id <![CDATA[<]]> #{chatId}
+		</if>
+		ORDER BY createAt DESC LIMIT 1) AS yn
+  </select>
 </mapper>

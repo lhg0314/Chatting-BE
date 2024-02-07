@@ -76,11 +76,9 @@ public class ChatController {
 	}
 	
 	@PostMapping("/chat/messageList")
-	public ApiResponse<Map<String, List>> getMessages(@RequestBody ChatListRequest req) {
-		Map<String, List> map = new HashMap<String, List>();
-		map.put("msgList", chatService.getMessageList(req));
+	public ApiResponse<Map<String, Object>> getMessages(@RequestBody ChatListRequest req) {
 		
-		return ApiResponse.success(map);
+		return ApiResponse.success(chatService.getMessageList(req));
 	}
 
 	/**
