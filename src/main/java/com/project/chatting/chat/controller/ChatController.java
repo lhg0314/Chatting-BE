@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,9 +25,12 @@ import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
+import com.project.chatting.chat.service.ChatFileService;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
 import com.project.chatting.user.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -37,6 +41,9 @@ public class ChatController {
 	@Autowired 
 	private ChatService chatService;
 	
+	@Autowired
+	private ChatFileService chatFileService;
+
 	@MessageMapping("/chat/{roomId}")
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
@@ -48,13 +55,11 @@ public class ChatController {
 	/**
 	 * 파일 업로드 처리
 	 */
-	// @MessageMapping("/chat/upload/{roomId}")
-	// @SendTo("/sub/room/{roomId}")
-	// public ApiResponse<ChatFileResponse> sendFile(@DestinationVariable(value = "roomId") int roomId, ChatFileRequest ChatFileRequest){
-	// 	chatService.inserFile(ChatFileRequest);
-
-	// 	return ApiResponse.success(ChatFileResponse.toDto(ChatFileRequest));
-	// }
+	@PostMapping("/chat/upload")
+	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, HttpServletRequest req){
+		System.out.println(ChatFileRequest.toString()); 
+		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, req.getSession().getServletContext().getRealPath("resources")));
+	}
 
 	/**
 	 * 채팅방 생성

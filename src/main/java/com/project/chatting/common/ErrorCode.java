@@ -23,7 +23,8 @@ public enum ErrorCode {
 	TOKEN_EXPIRED_EXCEPTION("C008", "토큰이 만료되었습니다. 다시 로그인 해주세요"),
     CONFLICT_TOKEN_EXCEPTION("C009","토큰이 유효하지 않습니다. 다시 로그인 해주세요"),
 
-    CONFLICT_ROOM_EXIST_EXCEPTION("C010","채팅방이 존재하지 않습니다.");
+    CONFLICT_ROOM_EXIST_EXCEPTION("C010","채팅방이 존재하지 않습니다."),
+    CONFLICT_FILE_EXCEPTION("C011", "파일 업로드중 오류가 발생했습니다.");
 
     private final String code;
     private final String message;
