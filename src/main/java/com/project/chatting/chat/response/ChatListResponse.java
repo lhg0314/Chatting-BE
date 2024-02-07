@@ -23,9 +23,6 @@ public class ChatListResponse {
 	private String createAt;
 	private int readCnt;
 	private List<String> users;
-	private String nextYn;
-	private int nowPage;
-	private int allPage; //서버만 알고있을거면 삭제
 	
 	public static ChatListResponse toChatDto(Chat chat) {
 		return ChatListResponse.builder()

@@ -100,7 +100,7 @@ public class ChatService {
 		});
 		
 		chatRepository.setChatRead(listmap); //채팅 읽음 insert
-		
+
 		// 메시지 타입별 db insert
 		if (req.getMessageType() == "FILE") {
 			// 파일 업로드 함수 호출
@@ -175,12 +175,16 @@ public class ChatService {
         return chatRepository.selectChatRoomList(userId);
     }
    	
-   	public List<ChatListResponse> getMessageList(ChatListRequest req) {
+   	public Map<String, Object> getMessageList(ChatListRequest req) {
+   		Map<String, Object> map = new HashMap<String, Object>();
    		List<ChatListResponse> resList = new ArrayList<ChatListResponse>();
    		List<ChatRequest> li = new ArrayList<>();
    		List<Chat> tempLi = new ArrayList<>();
    		
-		tempLi = chatRepository.getMessageList(req);
+   		tempLi = chatRepository.getMessageList(req);
+   		req.setChatId(req.getChatId() != 0 ? req.getChatId() - req.getCnt() : req.getChatId());
+		int nextYn = chatRepository.getNextDataYn(req);
+		
 		tempLi.forEach(item -> {
 			List<ChatRead> readUsers = chatRepository.getChatMessageUsers(item.getChatId());
 			List<String> userList = new ArrayList<>();
@@ -192,7 +196,11 @@ public class ChatService {
 			
 			resList.add(resChat);
 		});
-   		return resList;
+		
+		map.put("msgList", tempLi);
+		map.put("nextYn", nextYn == 1 ? "Y" : "N");
+		
+   		return map;
    	}
 
 	/**
