@@ -41,6 +41,18 @@ public class ChatController {
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
 		req.setRoomId(roomId);
+		System.out.println(req);
+		if(req.getMessageType() == "ENTER") {
+			ChatResponse cr = ChatResponse.builder()
+					.roomId(req.getRoomId())
+					.userId(req.getUserId())
+					.message(req.getUserId() + " 님 입장")
+					.messageType(req.getMessageType())
+					.createAt("")					
+					.build();
+			return ApiResponse.success(cr);
+		}
+		
 		
 		return ApiResponse.success(chatService.insertMessage(req));
 	}
@@ -68,7 +80,7 @@ public class ChatController {
 	
 	// 채팅방 목록 조회
 	@GetMapping("/chat/roomList")
-	public ApiResponse<Map<String, Object>> findAll(@RequestParam String userId) {
+	public ApiResponse<Map<String, Object>> findAll(@RequestParam (value="userId")String userId) {
 		Map<String, Object> chatRoomList = new HashMap<String, Object>();
 		chatRoomList.put("roomList", chatService.findAll(userId));
 
