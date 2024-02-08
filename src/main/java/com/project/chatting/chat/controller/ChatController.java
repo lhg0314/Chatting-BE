@@ -41,20 +41,23 @@ public class ChatController {
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
 		req.setRoomId(roomId);
-		System.out.println(req);
-		if(req.getMessageType() == "ENTER") {
-			ChatResponse cr = ChatResponse.builder()
+		ChatResponse cr = null;
+		//추후 Exit case추가
+		if( "ENTER".equals(req.getMessageType())) {
+			 cr = ChatResponse.builder()
 					.roomId(req.getRoomId())
 					.userId(req.getUserId())
 					.message(req.getUserId() + " 님 입장")
 					.messageType(req.getMessageType())
 					.createAt("")					
 					.build();
-			return ApiResponse.success(cr);
+			
+		}else {
+			//getMessageType = TALK or FILE
+			cr = chatService.insertMessage(req);
 		}
+		return ApiResponse.success(cr);
 		
-		
-		return ApiResponse.success(chatService.insertMessage(req));
 	}
 	
 	/**
