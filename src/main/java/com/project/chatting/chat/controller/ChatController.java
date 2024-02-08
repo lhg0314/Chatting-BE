@@ -56,9 +56,11 @@ public class ChatController {
 	 * 파일 업로드 처리
 	 */
 	@PostMapping("/chat/upload")
-	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, HttpServletRequest req){
+	//public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, HttpServletRequest req){
+	public void sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, HttpServletRequest req){
 		System.out.println(ChatFileRequest.toString()); 
-		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, req.getSession().getServletContext().getRealPath("resources")));
+		chatFileService.setFile(ChatFileRequest, req.getSession().getServletContext().getRealPath("/").concat("resources"));
+		//return ApiResponse.success(chatFileService.setFile(ChatFileRequest, req.getSession().getServletContext().getRealPath("/").concat("resources")));
 	}
 
 	/**
