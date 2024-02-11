@@ -17,9 +17,10 @@ import lombok.ToString;
 @Builder
 public class ChatListResponse {
 	private int chatId;
+	private int roomId;
 	private String userId;
-	private String msg;
-	private String msgType;
+	private String message;
+	private String messageType;
 	private String createAt;
 	private int readCnt;
 	private List<String> users;
@@ -27,9 +28,10 @@ public class ChatListResponse {
 	public static ChatListResponse toChatDto(Chat chat) {
 		return ChatListResponse.builder()
 				.chatId(chat.getChatId())
+				.roomId(chat.getRoomId())
 				.userId(chat.getUserId())
-				.msg(chat.getMessage())
-				.msgType(chat.getMessageType())
+				.message(chat.getMessage())
+				.messageType(chat.getMessageType())
 				.createAt(chat.getCreateAt())
 				.readCnt(chat.getReadCnt())
 				.build();
@@ -38,8 +40,8 @@ public class ChatListResponse {
 	public static ChatListResponse toReqDto(ChatRequest chatReq) {
 		return ChatListResponse.builder()
 				.userId(chatReq.getUserId())
-				.msg(chatReq.getMessage())
-				.msgType(chatReq.getMessageType())
+				.message(chatReq.getMessage())
+				.messageType(chatReq.getMessageType())
 				.createAt(chatReq.getCreateAt())
 				.readCnt(chatReq.getReadCnt())
 				.build();

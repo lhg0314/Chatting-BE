@@ -104,9 +104,9 @@
 	  SELECT * FROM chatContents 
 	  WHERE room_id=#{roomId}
 	  <if test="chatId != 0">
-		  AND chat_id <![CDATA[<]]> #{chatId}
+		  AND chat_id <![CDATA[>]]> #{chatId}
 	  </if>
-	  ORDER BY createAt DESC LIMIT #{cnt}
+	  ORDER BY createAt LIMIT #{cnt}
   </select>
   
   <!-- 채팅방 참여 인원수 조회 -->
@@ -133,8 +133,8 @@
 	  SELECT EXISTS (SELECT 1 FROM chatting_program.chatContents 
 		WHERE room_id=#{roomId}
 		<if test="chatId != 0">
-			AND chat_id <![CDATA[<]]> #{chatId}
+			AND chat_id <![CDATA[>]]> #{chatId}
 		</if>
-		ORDER BY createAt DESC LIMIT 1) AS yn
+		ORDER BY createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
   </select>
 </mapper>

@@ -107,6 +107,8 @@ public class ChatService {
 		} else if (req.getMessageType() == "EXIT"){
 			// 채팅방 삭제 함수 호출
 			// 삭제한 유저 id, 나갔습니다 메시지 추가하여 반환
+			//EXIT메세지만 줄지
+			req.setMessage(req.getUserId()+"님이 대화방을 나갔습니다.");
 		}
 		//
 		
@@ -182,9 +184,8 @@ public class ChatService {
    		List<Chat> tempLi = new ArrayList<>();
    		
    		tempLi = chatRepository.getMessageList(req);
-   		req.setChatId(req.getChatId() != 0 ? req.getChatId() - req.getCnt() : req.getChatId());
+   		
 		int nextYn = chatRepository.getNextDataYn(req);
-		
 		tempLi.forEach(item -> {
 			List<ChatRead> readUsers = chatRepository.getChatMessageUsers(item.getChatId());
 			List<String> userList = new ArrayList<>();
@@ -197,7 +198,7 @@ public class ChatService {
 			resList.add(resChat);
 		});
 		
-		map.put("msgList", tempLi);
+		map.put("msgList", resList);
 		map.put("nextYn", nextYn == 1 ? "Y" : "N");
 		
    		return map;
