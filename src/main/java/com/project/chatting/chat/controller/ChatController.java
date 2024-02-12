@@ -2,8 +2,8 @@ package com.project.chatting.chat.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
+
+import com.project.chatting.chat.response.ChatFileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatRequest;
-import com.project.chatting.chat.response.ChatFileResponse;
 import com.project.chatting.chat.response.ChatResponse;
-import com.project.chatting.chat.response.ChatRoomResponse;
-import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
@@ -71,11 +68,9 @@ public class ChatController {
 	 * 파일 업로드 처리
 	 */
 	@PostMapping("/chat/upload")
-	//public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, HttpServletRequest req){
-	public void sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, HttpServletRequest req){
-		System.out.println(ChatFileRequest.toString()); 
-		chatFileService.setFile(ChatFileRequest, req.getSession().getServletContext().getRealPath("/").concat("resources"));
-		//return ApiResponse.success(chatFileService.setFile(ChatFileRequest, req.getSession().getServletContext().getRealPath("/").concat("resources")));
+	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest){
+		System.out.println(ChatFileRequest.toString());
+		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, "src\\main\\resources\\static\\upload"));
 	}
 
 	/**
