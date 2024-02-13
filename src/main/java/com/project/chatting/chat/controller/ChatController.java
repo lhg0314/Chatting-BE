@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.project.chatting.chat.response.ChatFileResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,15 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.chatting.chat.repository.ChatRoomRepository;
 import com.project.chatting.chat.request.ChatFileRequest;
+import com.project.chatting.chat.response.ChatRoomResponse;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatRequest;
-import com.project.chatting.chat.response.ChatFileResponse;
 import com.project.chatting.chat.response.ChatResponse;
-import com.project.chatting.chat.response.ChatRoomResponse;
-import com.project.chatting.chat.request.CreateJoinRequest;
 import com.project.chatting.chat.request.CreateRoomRequest;
 import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
+import com.project.chatting.chat.service.ChatFileService;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
 import com.project.chatting.user.service.UserService;
@@ -46,6 +48,10 @@ public class ChatController {
 	
 	@Autowired
 	private ChatRoomRepository chatRoomRepository;
+
+	@Autowired
+	private ChatFileService chatFileService;
+
 	
 	@MessageMapping("/chat/{roomId}")
     @SendTo("/sub/room/{roomId}")
@@ -80,13 +86,11 @@ public class ChatController {
 	/**
 	 * 파일 업로드 처리
 	 */
-	// @MessageMapping("/chat/upload/{roomId}")
-	// @SendTo("/sub/room/{roomId}")
-	// public ApiResponse<ChatFileResponse> sendFile(@DestinationVariable(value = "roomId") int roomId, ChatFileRequest ChatFileRequest){
-	// 	chatService.inserFile(ChatFileRequest);
-
-	// 	return ApiResponse.success(ChatFileResponse.toDto(ChatFileRequest));
-	// }
+	@PostMapping("/chat/upload")
+	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest){
+		System.out.println(ChatFileRequest.toString());
+		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, "src\\main\\resources\\static\\upload"));
+	}
 
 	/**
 	 * 채팅방 생성

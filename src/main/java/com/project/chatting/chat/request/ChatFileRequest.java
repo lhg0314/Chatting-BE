@@ -20,17 +20,21 @@ import lombok.ToString;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatFileRequest {
 
+    private int roomId;
     private int chatId;
     private String fileName;
     private String fileExt;
     private String fileUrl;
+    private MultipartFile file;
 
-    public static ChatFileRequest toDto(int chatId, String fileName, String fileExt, String fileUrl){
+    public static ChatFileRequest toDto(int roomId, int chatId, String fileName, String fileExt, String fileUrl, MultipartFile file){
         return ChatFileRequest.builder()
+            .roomId(roomId)
             .chatId(chatId)
             .fileName(fileName)
             .fileExt(fileExt)
             .fileUrl(fileUrl)
+            .file(file)
             .build();
     }
 

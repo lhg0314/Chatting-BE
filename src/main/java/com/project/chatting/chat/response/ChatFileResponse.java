@@ -10,14 +10,14 @@ import lombok.ToString;
 @Builder
 public class ChatFileResponse {
 
-    private int chatId;
     private String fileName;
+    private String fileExt;
     private String fileUrl;
 
-    public static ChatFileResponse toDto(int chatId, String fileName, String fileUrl){
+    public static ChatFileResponse toDto(String fileName, String fileExt, String fileUrl){
         return ChatFileResponse.builder()
-            .chatId(chatId)
             .fileName(fileName)
+            .fileExt(fileExt)
             .fileUrl(fileUrl)
             .build();
     }
