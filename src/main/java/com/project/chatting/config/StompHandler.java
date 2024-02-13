@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.chatting.auth.JwtTokenProvider;
 import com.project.chatting.chat.entity.ChatSet;
@@ -38,12 +39,13 @@ public class StompHandler implements ChannelInterceptor {
 	private ChatSetService chatsetService;
 	
 
-
+	@Transactional(readOnly = true)
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);       
       
         if(accessor.getCommand() == StompCommand.CONNECT) {
+        	log.info("now :::::::::: CONNECT");
         	
         	 if(accessor.getNativeHeader("Authorization")!= null) {
  	            String accesstoken = accessor.getNativeHeader("Authorization").get(0);
@@ -62,6 +64,7 @@ public class StompHandler implements ChannelInterceptor {
         	log.info("SUBSCRIBE"); // stompClient.subscribe 실행 시 호출
         	log.info(accessor.toString());
         	String destination = accessor.getDestination();
+        	if(!destination.contains("/sub/room")) return message; // room입장이 아닐때 return
             int lastIndex = destination.lastIndexOf('/');
             String roomId = destination.substring(lastIndex + 1);
             String userId = "";
@@ -73,11 +76,8 @@ public class StompHandler implements ChannelInterceptor {
 	            chatRepo.plusUserCount(roomId,userId); // 유저 +1 처리	            
 	            log.info("인원수 조회:::::"+Arrays.toString(chatRepo.getUserCount(roomId)));
 	           
-	            
 	            ChatSet readReq = new ChatSet(Integer.parseInt(roomId),userId);
-	            
 	            chatsetService.updateReadYn(readReq); // 해당체팅방 DB메시지 읽음처리
-	            
 	            
             }
             

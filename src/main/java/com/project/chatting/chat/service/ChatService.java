@@ -101,16 +101,9 @@ public class ChatService {
 		
 		chatRepository.setChatRead(listmap); //채팅 읽음 insert
 
-		// 메시지 타입별 db insert
-		if (req.getMessageType() == "FILE") {
+		if ("FILE".equals(req.getMessageType())) {
 			// 파일 업로드 함수 호출
-		} else if (req.getMessageType() == "EXIT"){
-			// 채팅방 삭제 함수 호출
-			// 삭제한 유저 id, 나갔습니다 메시지 추가하여 반환
-			//EXIT메세지만 줄지
-			req.setMessage(req.getUserId()+"님이 대화방을 나갔습니다.");
 		}
-		//
 		
 		ChatResponse res = ChatResponse.toDto(req);
 		

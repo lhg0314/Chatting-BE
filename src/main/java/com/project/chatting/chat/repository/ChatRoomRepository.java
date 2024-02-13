@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -48,8 +49,9 @@ public class ChatRoomRepository {
     public String[] getUserCount(String roomId) {
     	String[] originList = (String.valueOf(redisTemplate.opsForValue().get(USER_COUNT + "_" + roomId))).split(",");
     	int position = originList.length;
-    	
-        return Arrays.copyOfRange(originList,1,position);
+    	HashSet<String> hashSet = new HashSet<>(Arrays.asList(originList));
+    	String[] resultArr = hashSet.toArray(new String[0]); // 세션 user중복 제거
+    	return Arrays.copyOfRange(resultArr,1,position);
     }
 
     // 채팅방에 입장한 유저수 +1
