@@ -148,7 +148,9 @@
   <!-- 이미지 파일 저장 -->
   <insert id="setFile" parameterType="com.project.chatting.chat.request.ChatFileRequest">
     INSERT INTO file (chat_id, file_name, file_ext, file_url)
-    VALUES (#{chatId}, #{fileName}, #{fileExt}, #{fileUrl})
+    VALUES ((SELECT chat_id FROM chatContents 
+    		WHERE user_id=#{fileMap.creater} AND createAt=#{fileMap.at} AND room_id=#{roomId}),
+    		 #{fileName}, #{fileExt}, #{fileUrl})
   </insert>
  <!--
   <select id="getNextDataYn" resultType="int">

@@ -67,6 +67,9 @@ public class ChatService {
 	
 //	@Autowired
 //	private RedisTemplate<String, ChatFileRequest> redisChatFileTemplate;
+	
+	@Autowired
+	private ChatFileService chatFileService;
 
 	@Transactional
 	public ChatResponse insertMessage(ChatRequest req) {
@@ -103,6 +106,20 @@ public class ChatService {
 
 		if ("FILE".equals(req.getMessageType())) {
 			// 파일 업로드 함수 호출
+			Map<String, String> fileMap = new HashMap<>();
+			
+			fileMap.put("creater", req.getUserId());
+			fileMap.put("at", now);
+			
+			ChatFileRequest cr = ChatFileRequest.builder()
+			.roomId(req.getRoomId())
+			.fileName(req.getFileName())
+			.fileExt(req.getFileExt())
+			.fileUrl(req.getFileUrl())
+			.fileMap(fileMap)
+			.build();
+			
+			chatFileService.insertFile(cr);
 		}
 		
 		ChatResponse res = ChatResponse.toDto(req);

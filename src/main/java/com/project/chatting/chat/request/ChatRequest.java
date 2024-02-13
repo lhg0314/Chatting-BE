@@ -28,6 +28,9 @@ public class ChatRequest {
 	private String message;
 	@NotBlank
 	private String messageType;
+	private String fileName;
+	private String fileExt;
+	private String fileUrl;
 	private String createAt;
 	private int readCnt;
 	
