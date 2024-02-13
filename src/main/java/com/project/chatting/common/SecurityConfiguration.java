@@ -86,7 +86,8 @@ public class SecurityConfiguration{
             	      "/ws/**" ,
             	      "/webjars/**",
             	      "/**.html",
-            	      "/**.js"
+            	      "/**.js",
+					  "/upload/**"
             ).permitAll()
             .requestMatchers(swaggerPath).permitAll()
             // 그 외는 인증 필요

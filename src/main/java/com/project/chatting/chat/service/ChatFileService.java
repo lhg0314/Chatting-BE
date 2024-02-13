@@ -28,7 +28,8 @@ public class ChatFileService {
 
     @Autowired
     ResourceLoader rsLoader;
-    // 이미지 저장 경로, 이미지 이름을 저장함
+
+    // 이미지 저장 경로, 이미지 이름을 저장함 (서버쪽 파일만 저장)
     public ChatFileResponse setFile(ChatFileRequest chatFileRequest, String path){
 
         log.info("[파일 업로드 파라미터 경로] : " + path);
@@ -36,12 +37,12 @@ public class ChatFileService {
         String originalName = chatFileRequest.getFile().getOriginalFilename();
         String baseName = originalName.substring(0, originalName.lastIndexOf("."));
         String ext = originalName.substring(originalName.lastIndexOf("."));
-        String fileName = UUID.randomUUID().toString() + "_" + baseName + ext;
+        String fileName = UUID.randomUUID().toString() + "_" + baseName;
         //String returnPath = "static\\";
         // 이미지 저장 경로
-        String imageUploadPath = path + File.separator + chatFileRequest.getRoomId() + File.separator+ fileName;
+        String imageUploadPath = path + File.separator + chatFileRequest.getRoomId() + File.separator+ fileName + ext;
         Path folderPath = Paths.get(path, String.valueOf(chatFileRequest.getRoomId()));
-        Path filePath = Paths.get(path,String.valueOf(chatFileRequest.getRoomId()),fileName);
+        Path filePath = Paths.get(path,String.valueOf(chatFileRequest.getRoomId()),fileName + ext);
         log.info("[이미지 파일 업로드 경로] : " + filePath.toString());
 
         // 채팅방 별 이미지 저장을 위한 폴더 생성
@@ -50,22 +51,21 @@ public class ChatFileService {
         //    imageUploadFolder.mkdir();
         //}
 
-
-
         try{
             if(!Files.exists(folderPath)){
                 Files.createDirectories(folderPath);
             }
-
             Files.write(filePath, chatFileRequest.getFile().getBytes());
-            //chatFileRequest.getFile().transferTo(imageUploadFolder);
-            //returnPath += imageUploadPath.substring(imageUploadPath.indexOf("upload"));
-
-            chatRepository.setFile(ChatFileRequest.toDto(chatFileRequest.getRoomId(), chatFileRequest.getChatId(), fileName, ext, imageUploadPath, null));
         }catch(IOException e){
             log.error(e.getMessage());
         }
 
-        return ChatFileResponse.toDto(chatFileRequest.getChatId(), fileName, imageUploadPath);
+        return ChatFileResponse.toDto(fileName, ext, imageUploadPath);
     }
+
+    // 이미지 DB 데이터 삽입
+    public void insertFile(ChatFileRequest chatFileRequest){
+        chatRepository.setFile(chatFileRequest);
+    }
+
 }
