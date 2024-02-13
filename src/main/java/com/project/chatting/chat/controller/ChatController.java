@@ -66,6 +66,7 @@ public class ChatController {
 			List<String> connectUsers = Arrays.asList(chatRoomRepository.getUserCount(Integer.toString(req.getRoomId())));
 			req.setUsers(connectUsers);
 			req.setCreateAt("");
+			req.setMessage(req.getUserId() + " 님 퇴장");
 			
 			cr = ChatResponse.toDto(req);
 			
