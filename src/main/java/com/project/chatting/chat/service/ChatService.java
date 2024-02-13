@@ -96,7 +96,7 @@ public class ChatService {
 			
 			map.put("creater", req.getUserId());
 			map.put("id", item);
-			map.put("yn", connectUsers.contains(item) ? "1" : "0");
+			map.put("yn", connectUsers.contains(item) || req.getUserId().equals(item) ? "1" : "0");
 			map.put("at", now);
 			
 			listmap.add(new ChatReadRequest(req.getRoomId(), map));
