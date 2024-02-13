@@ -51,7 +51,10 @@ public class ChatRoomRepository {
     	int position = originList.length;
     	HashSet<String> hashSet = new HashSet<>(Arrays.asList(originList));
     	String[] resultArr = hashSet.toArray(new String[0]); // 세션 user중복 제거
-    	return Arrays.copyOfRange(resultArr,1,position);
+    	resultArr = Arrays.stream(resultArr)
+        .filter(item -> !item.equals("null"))
+        .toArray(String[]::new);
+    	return Arrays.copyOfRange(resultArr,0,position-1);
     }
 
     // 채팅방에 입장한 유저수 +1
