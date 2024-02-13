@@ -46,7 +46,7 @@ public class StompHandler implements ChannelInterceptor {
       
         if(accessor.getCommand() == StompCommand.CONNECT) {
         	log.info("now :::::::::: CONNECT");
-        	
+        	log.info(accessor.toString());
         	 if(accessor.getNativeHeader("Authorization")!= null) {
  	            String accesstoken = accessor.getNativeHeader("Authorization").get(0);
  	            try {
@@ -98,10 +98,10 @@ public class StompHandler implements ChannelInterceptor {
             	 roomId = roomaAndUserInfo.substring(0, index);
             	 userId = roomaAndUserInfo.substring(index+1);
             	 chatRepo.minusUserCount(roomId, userId);
+            	 chatRepo.removeUserEnterInfo(sessionId); // 세션 정보 삭제
             }
             
           
-            chatRepo.removeUserEnterInfo(sessionId); // 세션 정보 삭제
         }
         return message;
     }
