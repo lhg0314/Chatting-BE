@@ -27,6 +27,10 @@ import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
 import com.project.chatting.user.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.validation.Valid;
 
 @RestController
@@ -82,9 +86,12 @@ public class ChatController {
 	}
 	
 	// 채팅방 목록 조회
+	@Operation(summary = "채팅방 목록 조회")
 	@GetMapping("/chat/roomList")
-	public ApiResponse<Map<String, Object>> findAll(@RequestParam (value="userId")String userId) {
-		Map<String, Object> chatRoomList = new HashMap<String, Object>();
+	public ApiResponse<Map<String, List<ChatRoomResponse>>> findAll( 
+			@Parameter(name = "userId", description = "사용자 ID", in = ParameterIn.QUERY)
+			@RequestParam(value = "userId") String userId) {
+		Map<String, List<ChatRoomResponse>> chatRoomList = new HashMap<String, List<ChatRoomResponse>>();
 		chatRoomList.put("roomList", chatService.findAll(userId));
 
 		return ApiResponse.success(chatRoomList);
