@@ -99,16 +99,16 @@
   <select id="getRoomMember" parameterType="int">
 	  SELECT user_id  FROM chatJoin WHERE chatJoin.room_id = #{roomId}
   </select>
-  
+
   <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat" parameterType="com.project.chatting.chat.request.ChatListRequest">
 	  SELECT * FROM chatContents 
 	  WHERE room_id=#{roomId}
 	  <if test="chatId != 0">
-		  AND chat_id <![CDATA[>]]> #{chatId}
+		  AND chat_id <![CDATA[<]]> #{chatId}
 	  </if>
-	  ORDER BY createAt LIMIT #{cnt}
+	  ORDER BY createAt DESC LIMIT #{cnt}
   </select>
-  
+
   <!-- 채팅방 참여 인원수 조회 -->
   <select id="getChatJoinUsers" parameterType="int" resultType="int">
     SELECT COUNT(*) FROM chatJoin WHERE room_id = #{roomId} AND room_state = "Y"
@@ -128,7 +128,7 @@
     INSERT INTO file (chat_id, file_name, file_ext, file_url)
     VALUES (#{chatId}, #{fileName}, #{fileExt}, #{fileUrl})
   </insert>
-  
+ <!--
   <select id="getNextDataYn" resultType="int">
 	  SELECT EXISTS (SELECT 1 FROM chatting_program.chatContents 
 		WHERE room_id=#{roomId}
@@ -136,5 +136,14 @@
 			AND chat_id <![CDATA[>]]> #{chatId}
 		</if>
 		ORDER BY createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
+  </select>
+  -->
+  <select id="getNextDataYn" resultType="int">
+    SELECT EXISTS (SELECT 1 FROM chatContents 
+	  WHERE room_id=#{roomId}
+	  <if test="chatId != 0">
+		  AND chat_id <![CDATA[<]]> #{chatId}
+	  </if>
+	  ORDER BY createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
   </select>
 </mapper>
