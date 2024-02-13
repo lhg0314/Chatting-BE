@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.chatting.chat.repository.ChatRoomRepository;
 import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatRequest;
@@ -37,12 +40,15 @@ public class ChatController {
 	@Autowired 
 	private ChatService chatService;
 	
+	@Autowired
+	private ChatRoomRepository chatRoomRepository;
+	
 	@MessageMapping("/chat/{roomId}")
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
 		req.setRoomId(roomId);
 		ChatResponse cr = null;
-		//추후 Exit case추가
+		
 		if( "ENTER".equals(req.getMessageType())) {
 			 cr = ChatResponse.builder()
 					.roomId(req.getRoomId())
@@ -52,8 +58,14 @@ public class ChatController {
 					.createAt("")					
 					.build();
 			
-		}else {
-			//getMessageType = TALK or FILE
+		} else if ("EXIT".equals(req.getMessageType())){
+			List<String> connectUsers = Arrays.asList(chatRoomRepository.getUserCount(Integer.toString(req.getRoomId())));
+			req.setUsers(connectUsers);
+			req.setCreateAt("");
+			
+			cr = ChatResponse.toDto(req);
+			
+		} else {
 			cr = chatService.insertMessage(req);
 		}
 		return ApiResponse.success(cr);
