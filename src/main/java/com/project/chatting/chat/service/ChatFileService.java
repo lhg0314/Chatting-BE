@@ -40,7 +40,7 @@ public class ChatFileService {
         String fileName = UUID.randomUUID().toString() + "_" + baseName;
         //String returnPath = "static\\";
         // 이미지 저장 경로
-        String imageUploadPath = path + File.separator + chatFileRequest.getRoomId() + File.separator+ fileName + ext;
+        String imageUploadPath = path.substring(path.indexOf("upload")) + File.separator + chatFileRequest.getRoomId() + File.separator+ fileName + ext;
         Path folderPath = Paths.get(path, String.valueOf(chatFileRequest.getRoomId()));
         Path filePath = Paths.get(path,String.valueOf(chatFileRequest.getRoomId()),fileName + ext);
         log.info("[이미지 파일 업로드 경로] : " + filePath.toString());
