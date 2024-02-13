@@ -1,5 +1,7 @@
 package com.project.chatting.chat.request;
 
+import java.util.Map;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.chatting.chat.entity.Chat;
@@ -21,16 +23,15 @@ import lombok.ToString;
 public class ChatFileRequest {
 
     private int roomId;
-    private int chatId;
     private String fileName;
     private String fileExt;
     private String fileUrl;
     private MultipartFile file;
+    private Map<String, String> fileMap;
 
     public static ChatFileRequest toDto(int roomId, int chatId, String fileName, String fileExt, String fileUrl, MultipartFile file){
         return ChatFileRequest.builder()
             .roomId(roomId)
-            .chatId(chatId)
             .fileName(fileName)
             .fileExt(fileExt)
             .fileUrl(fileUrl)

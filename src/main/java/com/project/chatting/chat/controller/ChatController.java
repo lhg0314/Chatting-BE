@@ -52,7 +52,6 @@ public class ChatController {
 	@Autowired
 	private ChatFileService chatFileService;
 
-	
 	@MessageMapping("/chat/{roomId}")
     @SendTo("/sub/room/{roomId}")
 	public ApiResponse<ChatResponse> sendMessage(@DestinationVariable(value = "roomId") int roomId, ChatRequest req) {
@@ -114,6 +113,9 @@ public class ChatController {
 		return ApiResponse.success(chatRoomList);
 	}
 	
+	/**
+	 * 메시지 리스트 조회
+	 */
 	@PostMapping("/chat/messageList")
 	public ApiResponse<Map<String, Object>> getMessages(@RequestBody ChatListRequest req) {
 		

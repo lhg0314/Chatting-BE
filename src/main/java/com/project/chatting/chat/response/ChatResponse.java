@@ -23,6 +23,9 @@ public class ChatResponse {
 	private String createAt;
 	private int readCnt;
 	private List<String> users;
+	private String fileName;
+	private String fileExt;
+	private String fileUrl;
 	
 	public static ChatResponse toDto(ChatRequest chatReq) {
 		return ChatResponse.builder()
@@ -33,6 +36,9 @@ public class ChatResponse {
 				.createAt(chatReq.getCreateAt())
 				.readCnt(chatReq.getReadCnt())
 				.users(chatReq.getUsers())
+				.fileExt(chatReq.getFileExt())
+				.fileName(chatReq.getFileName())
+				.fileUrl(chatReq.getFileUrl())
 				.build();
 				
 	}
