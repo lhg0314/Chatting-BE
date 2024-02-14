@@ -51,4 +51,6 @@ public interface ChatRepository {
 	public void setFile(ChatFileRequest chatFileRequest);
 	
 	public int getNextDataYn(ChatListRequest req);
+	
+	public int getExistRoom(int roomId, String userId);
 }

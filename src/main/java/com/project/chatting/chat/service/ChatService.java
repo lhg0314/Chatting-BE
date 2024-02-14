@@ -46,6 +46,7 @@ import com.project.chatting.chat.request.LeaveChatRoomRequest;
 import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.ConflictException;
+import com.project.chatting.exception.NotFoundException;
 import com.project.chatting.user.repository.UserRepository;
 
 
@@ -196,6 +197,10 @@ public class ChatService {
     }
    	
    	public Map<String, Object> getMessageList(ChatListRequest req) {
+   		if(chatRepository.getExistRoom(req.getRoomId(), req.getUserId()) == 0){
+			throw new NotFoundException("존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
+		}
+   		
    		Map<String, Object> map = new HashMap<String, Object>();
    		List<ChatListResponse> resList = new ArrayList<ChatListResponse>();
    		List<ChatRequest> li = new ArrayList<>();

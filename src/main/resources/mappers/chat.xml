@@ -174,4 +174,11 @@
 	  </if>
 	  ORDER BY ct.createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
   </select>
+  
+  <select id="getExistRoom" resultType="int">
+	  SELECT COUNT(*) FROM chatJoin
+      where room_id=#{arg0}
+      AND user_id=#{arg1}
+      AND room_state='Y'
+  </select>
 </mapper>
