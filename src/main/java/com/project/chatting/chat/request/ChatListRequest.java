@@ -20,4 +20,5 @@ public class ChatListRequest {
 	private int roomId;
 	private int chatId;
 	private int cnt;
+	private String userId;
 }
