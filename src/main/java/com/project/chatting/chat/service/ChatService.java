@@ -28,8 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.entity.ChatRead;
+import com.project.chatting.chat.entity.ChatSet;
 import com.project.chatting.chat.repository.ChatRepository;
 import com.project.chatting.chat.repository.ChatRoomRepository;
+import com.project.chatting.chat.repository.ChatSetRepository;
 import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.request.ChatListRequest;
 import com.project.chatting.chat.request.ChatReadRequest;
@@ -70,6 +72,9 @@ public class ChatService {
 	
 	@Autowired
 	private ChatFileService chatFileService;
+
+	@Autowired
+	private ChatSetService chatSetService;
 
 	@Transactional
 	public ChatResponse insertMessage(ChatRequest req) {
@@ -176,9 +181,12 @@ public class ChatService {
 		int joinUsers = chatRepository.getChatJoinUsers(leaveChatRoomRequest.getRoomId());
 		System.out.println("참여자 인원수 : " + joinUsers);
 
-		// 모두 나갔을 경우 채팅방 삭제
 		if(joinUsers == 0){
+			// 모두 나갔을 경우 채팅방 삭제
 			chatRepository.deleteChatRoom(leaveChatRoomRequest.getRoomId());
+		}else{
+			// 채팅방 읽음 안읽음 수 조정
+			chatSetService.updateReadYn(new ChatSet(leaveChatRoomRequest.getRoomId(), leaveChatRoomRequest.getUserId()));
 		}
 	}
 
