@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.project.chatting.exception.ConflictException;
+import com.project.chatting.exception.NotFoundException;
 import com.project.chatting.exception.TokenException;
 import com.project.chatting.exception.UnAuthorizedException;
 
@@ -82,6 +83,16 @@ public class ControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnAuthorizedException.class)
     protected ApiResponse<Object> handleUnAuthorizedException(final UnAuthorizedException exception) {
+        log.error(exception.getMessage(), exception);
+        return ApiResponse.error(exception.getErrorCode());
+    }
+    
+    /**
+     * 404 NotFound
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    protected ApiResponse<Object> handleUnAuthorizedException(final NotFoundException exception) {
         log.error(exception.getMessage(), exception);
         return ApiResponse.error(exception.getErrorCode());
     }
