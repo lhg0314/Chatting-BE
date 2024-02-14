@@ -123,12 +123,14 @@
   </select>
 
   <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat" parameterType="com.project.chatting.chat.request.ChatListRequest">
-	  SELECT * FROM chatContents 
-	  WHERE room_id=#{roomId}
+	  SELECT ct.chat_id, ct.room_id, ct.user_id, ct.message, ct.message_type, ct.createAt, ct.readCnt, f.file_name, f.file_ext, f.file_url
+	  FROM chatContents ct LEFT JOIN file f
+	  ON ct.chat_id = f.chat_id
+	  WHERE ct.room_id=#{roomId}
 	  <if test="chatId != 0">
-		  AND chat_id <![CDATA[<]]> #{chatId}
+		  AND ct.chat_id <![CDATA[<]]> #{chatId}
 	  </if>
-	  ORDER BY createAt DESC LIMIT #{cnt}
+	  ORDER BY ct.createAt DESC LIMIT #{cnt}
   </select>
 
   <!-- 채팅방 참여 인원수 조회 -->
@@ -163,11 +165,13 @@
   </select>
   -->
   <select id="getNextDataYn" resultType="int">
-    SELECT EXISTS (SELECT 1 FROM chatContents 
-	  WHERE room_id=#{roomId}
+    SELECT EXISTS (SELECT 1 
+      FROM chatContents ct LEFT JOIN file f 
+      ON ct.chat_id = f.chat_id
+	  WHERE ct.room_id=#{roomId}
 	  <if test="chatId != 0">
-		  AND chat_id <![CDATA[<]]> #{chatId}
+		  AND ct.chat_id <![CDATA[<]]> #{chatId}
 	  </if>
-	  ORDER BY createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
+	  ORDER BY ct.createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
   </select>
 </mapper>
