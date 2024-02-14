@@ -123,7 +123,9 @@
   </select>
 
   <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat" parameterType="com.project.chatting.chat.request.ChatListRequest">
-	  SELECT * FROM chatContents 
+	  SELECT ct.chat_id, ct.room_id, ct.user_id, ct.message, ct.message_type, ct.createAt, ct.readCnt, f.file_name, f.file_ext, f.file_url
+	  FROM chatContents ct LEFT JOIN file f
+	  ON ct.chat_id = f.chat_id
 	  WHERE room_id=#{roomId}
 	  <if test="chatId != 0">
 		  AND chat_id <![CDATA[<]]> #{chatId}
@@ -163,7 +165,9 @@
   </select>
   -->
   <select id="getNextDataYn" resultType="int">
-    SELECT EXISTS (SELECT 1 FROM chatContents 
+    SELECT EXISTS (SELECT 1 
+      FROM chatContents ct LEFT JOIN file f 
+      ON ct.chat_id = f.chat_id
 	  WHERE room_id=#{roomId}
 	  <if test="chatId != 0">
 		  AND chat_id <![CDATA[<]]> #{chatId}

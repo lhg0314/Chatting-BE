@@ -21,6 +21,9 @@ public class Chat{
 	private String messageType;
 	private String createAt;
 	private int readCnt;
+	private String fileName;
+	private String fileExt;
+	private String fileUrl;
 	
 	public Chat() {
 		
