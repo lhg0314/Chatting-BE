@@ -2,6 +2,7 @@ package com.project.chatting.chat.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -66,6 +67,28 @@ public class ChatFileService {
     // 이미지 DB 데이터 삽입
     public void insertFile(ChatFileRequest chatFileRequest){
         chatRepository.setFile(chatFileRequest);
+    }
+
+    // 이미지 파일 삭제
+    public void deleteFile(int roomId){
+        Path rootPath = Paths.get("src\\main\\resources\\static\\upload");
+        Path folderPath = Paths.get("src\\main\\resources\\static\\upload" + File.separator + roomId);
+
+        File folder = new File(folderPath.toString());
+        File root = new File(rootPath.toString());
+
+        if(folder.exists()){
+            File[] fileList = folder.listFiles();
+            for(File f : fileList){
+                f.delete();
+            }
+            folder.delete();
+        }
+
+        if(root.listFiles().length == 0){
+            root.delete();
+        }
+                
     }
 
 }
