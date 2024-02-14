@@ -174,6 +174,8 @@ public class ChatService {
 			throw new ConflictException("채팅방이 없습니다.", ErrorCode.CONFLICT_ROOM_EXIST_EXCEPTION);
 		}
 
+		chatSetService.updateReadYn(new ChatSet(leaveChatRoomRequest.getRoomId(), leaveChatRoomRequest.getUserId()));
+
 		// room_state Y => N 으로 변경
 		chatRepository.setLeaveChatJoin(leaveChatRoomRequest);
 
@@ -184,11 +186,9 @@ public class ChatService {
 		if(joinUsers == 0){
 			// 모두 나갔을 경우 채팅방 삭제
 			chatRepository.deleteChatRoom(leaveChatRoomRequest.getRoomId());
-		}else{
-			// 채팅방 읽음 안읽음 수 조정
-			chatSetService.updateReadYn(new ChatSet(leaveChatRoomRequest.getRoomId(), leaveChatRoomRequest.getUserId()));
 		}
 	}
+
 
 	// 채팅방 목록 조회
    	public List<ChatRoomResponse> findAll(String userId) {
