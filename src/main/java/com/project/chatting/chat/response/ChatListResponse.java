@@ -24,6 +24,9 @@ public class ChatListResponse {
 	private String createAt;
 	private int readCnt;
 	private List<String> users;
+	private String fileName;
+	private String fileExt;
+	private String fileUrl;
 	
 	public static ChatListResponse toChatDto(Chat chat) {
 		return ChatListResponse.builder()
@@ -32,6 +35,9 @@ public class ChatListResponse {
 				.userId(chat.getUserId())
 				.message(chat.getMessage())
 				.messageType(chat.getMessageType())
+				.fileExt(chat.getFileExt())
+				.fileName(chat.getFileName())
+				.fileUrl(chat.getFileUrl())
 				.createAt(chat.getCreateAt())
 				.readCnt(chat.getReadCnt())
 				.build();
