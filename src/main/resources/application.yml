@@ -13,6 +13,10 @@ spring:
     redis:
       host: localhost
       port: 6379
+  servlet:
+    multipart:
+      maxFileSize: 6MB
+      maxRequestSize: 100MB
 
 mybatis:
   configuration:

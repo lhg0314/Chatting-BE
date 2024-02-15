@@ -79,7 +79,8 @@ public class ChatController {
 	/**
 	 * 파일 업로드 처리
 	 */
-	@PostMapping("/chat/upload")
+	@PostMapping(value = "/chat/upload", consumes="multipart/form-data")
+	@Operation(summary = "파일 업로드")
 	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest){
 		System.out.println(ChatFileRequest.toString());
 		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, "src\\main\\resources\\static\\upload"));
