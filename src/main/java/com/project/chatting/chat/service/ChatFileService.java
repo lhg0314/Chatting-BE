@@ -17,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import com.project.chatting.chat.repository.ChatRepository;
 import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.response.ChatFileResponse;
+import com.project.chatting.common.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +35,8 @@ public class ChatFileService {
     public ChatFileResponse setFile(ChatFileRequest chatFileRequest, String path){
 
         log.info("[파일 업로드 파라미터 경로] : " + path);
+        
+        FileUtils.validateImageFile(chatFileRequest.getFile().getContentType());
 
         String originalName = chatFileRequest.getFile().getOriginalFilename();
         String baseName = originalName.substring(0, originalName.lastIndexOf("."));

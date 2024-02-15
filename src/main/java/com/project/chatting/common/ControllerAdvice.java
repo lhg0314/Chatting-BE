@@ -17,6 +17,7 @@ import com.project.chatting.exception.ConflictException;
 import com.project.chatting.exception.NotFoundException;
 import com.project.chatting.exception.TokenException;
 import com.project.chatting.exception.UnAuthorizedException;
+import com.project.chatting.exception.ValidationException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -57,10 +58,10 @@ public class ControllerAdvice {
     @ExceptionHandler({
         HttpMessageNotReadableException.class,
         InvalidFormatException.class,
-        ServletRequestBindingException.class
+        ServletRequestBindingException.class,
     })
     protected ApiResponse<Object> handleInvalidFormatException(final Exception e) {
-        log.error(e.getMessage(), e);
+        log.error(e.getMessage(), e); 
         return ApiResponse.error(ErrorCode.VALIDATION_EXCEPTION);
     }
     
@@ -116,6 +117,14 @@ public class ControllerAdvice {
         return ApiResponse.error(exception.getErrorCode());
     }
 
+    /**
+     * File Validate Exception
+     */
+    @ExceptionHandler(ValidationException.class)
+    protected ApiResponse<Object> handleTokenExpiredException(ValidationException exception){
+        log.error(exception.getMessage(), exception);
+        return ApiResponse.error(ErrorCode.VALIDATION_FILE_FORMAT_EXCEPTION);
+    }
 
 
 
