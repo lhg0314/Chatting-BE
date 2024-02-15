@@ -24,7 +24,8 @@ public enum ErrorCode {
     CONFLICT_TOKEN_EXCEPTION("C009","토큰이 유효하지 않습니다. 다시 로그인 해주세요"),
 
     CONFLICT_ROOM_EXIST_EXCEPTION("C010","채팅방이 존재하지 않습니다."),
-    CONFLICT_FILE_EXCEPTION("C011", "파일 업로드중 오류가 발생했습니다.");
+    CONFLICT_FILE_EXCEPTION("C011", "파일 업로드중 오류가 발생했습니다."),
+	VALIDATION_FILE_FORMAT_EXCEPTION("C12", "허용되지 않은 파일입니다");
 
     private final String code;
     private final String message;
