@@ -2,6 +2,7 @@ package com.project.chatting.chat.repository;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.entity.ChatRead;
@@ -52,5 +53,5 @@ public interface ChatRepository {
 	
 	public int getNextDataYn(ChatListRequest req);
 	
-	public int getExistRoom(int roomId, String userId);
+	public int getExistRoom(@Param("roomId") int roomId, @Param("userId") String userId);
 }
