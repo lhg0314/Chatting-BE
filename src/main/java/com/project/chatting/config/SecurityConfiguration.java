@@ -1,4 +1,4 @@
-package com.project.chatting.common;
+package com.project.chatting.config;
 
 import java.util.Arrays;
 import java.util.Collections;
