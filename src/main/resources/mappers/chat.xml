@@ -177,8 +177,8 @@
   
   <select id="getExistRoom" resultType="int">
 	  SELECT COUNT(*) FROM chatJoin
-      where room_id=#{arg0}
-      AND user_id=#{arg1}
+      where room_id=#{roomId}
+      AND user_id=#{userId}
       AND room_state='Y'
   </select>
 </mapper>
