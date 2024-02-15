@@ -26,6 +26,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.chatting.auth.JwtTokenProvider;
 import com.project.chatting.chat.entity.Chat;
 import com.project.chatting.chat.entity.ChatRead;
 import com.project.chatting.chat.entity.ChatSet;
@@ -48,6 +49,8 @@ import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.ConflictException;
 import com.project.chatting.exception.NotFoundException;
 import com.project.chatting.user.repository.UserRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 
@@ -73,6 +76,9 @@ public class ChatService {
 	
 	@Autowired
 	private ChatFileService chatFileService;
+	
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
 
 	@Autowired
 	private ChatSetService chatSetService;
@@ -196,8 +202,10 @@ public class ChatService {
         return chatRepository.selectChatRoomList(userId);
     }
    	
-   	public Map<String, Object> getMessageList(ChatListRequest req) {
-   		if(chatRepository.getExistRoom(req.getRoomId(), req.getUserId()) == 0){
+   	public Map<String, Object> getMessageList(ChatListRequest req, HttpServletRequest httpReq) {
+   		String userId = jwtTokenProvider.getUserIdFromToken(jwtTokenProvider.resolveToken(httpReq));
+   		System.out.println("::userId = "+userId);
+   		if(chatRepository.getExistRoom(req.getRoomId(), userId) == 0){
 			throw new NotFoundException("존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
 		}
    		
