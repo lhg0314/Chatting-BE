@@ -85,7 +85,7 @@ public class ChatService {
 
 	@Transactional
 	public ChatResponse insertMessage(ChatRequest req) {
-		String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+		String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSS"));
 		
 		req.setCreateAt(now);
 		int allMember = chatRepository.getChatMemberCnt(req.getRoomId());
@@ -97,6 +97,10 @@ public class ChatService {
 		// 안읽음 숫자
 		req.setReadCnt(allMember - connectMember);
 		req.setUsers(connectUsers);
+
+		if ("EXIT".equals(req.getMessageType())){
+			req.setMessage(req.getUserId() + " 님 퇴장");
+		}
 		
 		chatRepository.setChatMessage(req); //채팅 내용 insert
 		
