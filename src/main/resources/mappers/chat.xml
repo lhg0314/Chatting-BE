@@ -99,7 +99,7 @@
 	    (cc.createAt IS NULL OR cc.createAt = (
 	        SELECT MAX(createAt)
 	        FROM chatContents
-	        WHERE room_id = cr.room_id
+	        WHERE room_id = cr.room_id AND message_type != 'EXIT'
 	    ))
 	GROUP BY
 	    cr.room_id
