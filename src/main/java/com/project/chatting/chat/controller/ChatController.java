@@ -36,6 +36,7 @@ import com.project.chatting.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -117,9 +118,9 @@ public class ChatController {
 	 * 메시지 리스트 조회
 	 */
 	@PostMapping("/chat/messageList")
-	public ApiResponse<Map<String, Object>> getMessages(@RequestBody ChatListRequest req) {
+	public ApiResponse<Map<String, Object>> getMessages(@RequestBody ChatListRequest req, HttpServletRequest httpReq) {
 		
-		return ApiResponse.success(chatService.getMessageList(req));
+		return ApiResponse.success(chatService.getMessageList(req, httpReq));
 	}
 
 	/**
