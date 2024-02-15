@@ -97,6 +97,10 @@ public class ChatService {
 		// 안읽음 숫자
 		req.setReadCnt(allMember - connectMember);
 		req.setUsers(connectUsers);
+
+		if ("EXIT".equals(req.getMessageType())){
+			req.setMessage(req.getUserId() + " 님 퇴장");
+		}
 		
 		chatRepository.setChatMessage(req); //채팅 내용 insert
 		

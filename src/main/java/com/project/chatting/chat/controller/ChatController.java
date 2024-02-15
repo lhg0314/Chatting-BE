@@ -68,15 +68,8 @@ public class ChatController {
 					.createAt("")					
 					.build();
 			
-		} else if ("EXIT".equals(req.getMessageType())){
-			List<String> connectUsers = Arrays.asList(chatRoomRepository.getUserCount(Integer.toString(req.getRoomId())));
-			req.setUsers(connectUsers);
-			req.setCreateAt("");
-			req.setMessage(req.getUserId() + " 님 퇴장");
-			
-			cr = ChatResponse.toDto(req);
-			
 		} else {
+			
 			cr = chatService.insertMessage(req);
 		}
 		return ApiResponse.success(cr);
