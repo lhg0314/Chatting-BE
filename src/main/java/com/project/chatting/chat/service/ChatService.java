@@ -100,6 +100,8 @@ public class ChatService {
 
 		if ("EXIT".equals(req.getMessageType())){
 			req.setMessage(req.getUserId() + " 님 퇴장");
+		} else if ("FILE".equals(req.getMessageType())) { 
+			req.setMessage("사진을 보냈습니다.");
 		}
 		
 		chatRepository.setChatMessage(req); //채팅 내용 insert
