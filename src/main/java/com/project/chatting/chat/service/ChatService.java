@@ -85,7 +85,7 @@ public class ChatService {
 
 	@Transactional
 	public ChatResponse insertMessage(ChatRequest req) {
-		String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+		String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSS"));
 		
 		req.setCreateAt(now);
 		int allMember = chatRepository.getChatMemberCnt(req.getRoomId());
