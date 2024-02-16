@@ -17,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import com.project.chatting.chat.repository.ChatRepository;
 import com.project.chatting.chat.request.ChatFileRequest;
 import com.project.chatting.chat.response.ChatFileResponse;
+import com.project.chatting.common.FileUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +35,8 @@ public class ChatFileService {
     public ChatFileResponse setFile(ChatFileRequest chatFileRequest, String path){
 
         log.info("[파일 업로드 파라미터 경로] : " + path);
+        
+        FileUtils.validateImageFile(chatFileRequest.getFile().getContentType());
 
         String originalName = chatFileRequest.getFile().getOriginalFilename();
         String baseName = originalName.substring(0, originalName.lastIndexOf("."));
@@ -42,6 +45,7 @@ public class ChatFileService {
         //String returnPath = "static\\";
         // 이미지 저장 경로
         String imageUploadPath = path.substring(path.indexOf("upload")) + File.separator + chatFileRequest.getRoomId() + File.separator+ fileName + ext;
+        
         Path folderPath = Paths.get(path, String.valueOf(chatFileRequest.getRoomId()));
         Path filePath = Paths.get(path,String.valueOf(chatFileRequest.getRoomId()),fileName + ext);
         log.info("[이미지 파일 업로드 경로] : " + filePath.toString());
@@ -57,6 +61,7 @@ public class ChatFileService {
                 Files.createDirectories(folderPath);
             }
             Files.write(filePath, chatFileRequest.getFile().getBytes());
+            imageUploadPath = imageUploadPath.replaceAll("\\\\","/");
         }catch(IOException e){
             log.error(e.getMessage());
         }

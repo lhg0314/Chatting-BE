@@ -68,15 +68,8 @@ public class ChatController {
 					.createAt("")					
 					.build();
 			
-		} else if ("EXIT".equals(req.getMessageType())){
-			List<String> connectUsers = Arrays.asList(chatRoomRepository.getUserCount(Integer.toString(req.getRoomId())));
-			req.setUsers(connectUsers);
-			req.setCreateAt("");
-			req.setMessage(req.getUserId() + " 님 퇴장");
-			
-			cr = ChatResponse.toDto(req);
-			
 		} else {
+			
 			cr = chatService.insertMessage(req);
 		}
 		return ApiResponse.success(cr);
@@ -86,7 +79,8 @@ public class ChatController {
 	/**
 	 * 파일 업로드 처리
 	 */
-	@PostMapping("/chat/upload")
+	@PostMapping(value = "/chat/upload", consumes="multipart/form-data")
+	@Operation(summary = "파일 업로드")
 	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest){
 		System.out.println(ChatFileRequest.toString());
 		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, "src\\main\\resources\\static\\upload"));
