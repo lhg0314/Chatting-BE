@@ -11,6 +11,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.project.chatting.exception.ConflictException;
@@ -123,12 +124,19 @@ public class ControllerAdvice {
      * File Validate Exception
      */
     @ExceptionHandler(ValidationException.class)
-    protected ApiResponse<Object> handleTokenExpiredException(ValidationException exception){
+    protected ApiResponse<Object> handleFileValidateException(ValidationException exception){
         log.error(exception.getMessage(), exception);
         return ApiResponse.error(ErrorCode.VALIDATION_FILE_FORMAT_EXCEPTION);
     }
 
-
+    /**
+     * File Max size Exception
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ApiResponse<Object> handleFileMaxSizeExceededException(final MaxUploadSizeExceededException exception){
+        log.error(exception.getMessage(), exception);
+        return ApiResponse.error(ErrorCode.EXCEEDED_FILE_EXCEPTION);
+    }
 
 
 
