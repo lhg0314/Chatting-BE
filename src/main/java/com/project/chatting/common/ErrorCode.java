@@ -26,7 +26,8 @@ public enum ErrorCode {
 
     CONFLICT_ROOM_EXIST_EXCEPTION("C010","채팅방이 존재하지 않습니다."),
     CONFLICT_FILE_EXCEPTION("C011", "파일 업로드중 오류가 발생했습니다."),
-	VALIDATION_FILE_FORMAT_EXCEPTION("C012", "허용되지 않은 파일입니다");
+	VALIDATION_FILE_FORMAT_EXCEPTION("C012", "허용되지 않은 파일입니다"),
+    EXCEEDED_FILE_EXCEPTION("C013", "파일의 크기를 초과했습니다.");
 
     private final String code;
     private final String message;
