@@ -60,7 +60,7 @@ public class ControllerAdvice {
         ServletRequestBindingException.class
     })
     protected ApiResponse<Object> handleInvalidFormatException(final Exception e) {
-        log.error(e.getMessage(), e);
+      
         return ApiResponse.error(ErrorCode.BAD_REQUEST_EXCEPTION);
     }
     
