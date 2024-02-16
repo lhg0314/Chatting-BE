@@ -50,7 +50,7 @@ public class ControllerAdvice {
     @ExceptionHandler(BindException.class)
     protected ApiResponse<Object> handleBadRequest(BindException e) {
         log.error(e.getMessage(), e);
-        return ApiResponse.error(ErrorCode.VALIDATION_EXCEPTION, Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
+        return ApiResponse.error(ErrorCode.BAD_REQUEST_EXCEPTION, Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -61,7 +61,7 @@ public class ControllerAdvice {
     })
     protected ApiResponse<Object> handleInvalidFormatException(final Exception e) {
         log.error(e.getMessage(), e);
-        return ApiResponse.error(ErrorCode.VALIDATION_EXCEPTION);
+        return ApiResponse.error(ErrorCode.BAD_REQUEST_EXCEPTION);
     }
     
     /**
