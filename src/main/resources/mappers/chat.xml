@@ -58,7 +58,7 @@
   </insert>
   
   <select id="getChatMemberCnt" parameterType="int" resultType="int">
-	  SELECT COUNT(*) FROM chatJoin WHERE room_id = #{roomID}
+	  SELECT COUNT(*) FROM chatJoin WHERE room_id = #{roomID} AND room_state = "Y"
   </select>
   
   <insert id="setChatMessage" parameterType="com.project.chatting.chat.request.ChatRequest">
