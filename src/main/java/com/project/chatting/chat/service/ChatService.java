@@ -198,6 +198,7 @@ public class ChatService {
 
 		if(joinUsers == 0){
 			// 모두 나갔을 경우 채팅방 삭제
+			chatFileService.deleteFile(leaveChatRoomRequest.getRoomId());
 			chatRepository.deleteChatRoom(leaveChatRoomRequest.getRoomId());
 		}
 	}
