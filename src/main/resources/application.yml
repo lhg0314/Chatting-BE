@@ -5,18 +5,16 @@ spring:
   profiles:
     active: local
   datasource:
-    url: jdbc:mariadb://211.118.245.244:4120/chatting_program?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:log4jdbc:mariadb://211.118.245.244:4120/chatting_program?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: open1404
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
-  servlet:
-    multipart:
-      maxFileSize: 4MB
-      maxRequestSize: 10MB
+      
+
 
 mybatis:
   configuration:
@@ -30,9 +28,21 @@ mybatis:
 
 jwt:
   secret: kevin1234123412341234123412341234
-  refresh-token-validity-in-seconds: 600000 # 10분 # 7200000 2시간
-  access-token-validity-in-seconds: 10000 # 10초
+  refresh-token-validity-in-seconds: 7200000 # 2시간
+  access-token-validity-in-seconds: 600000 # 10분
 
 logging:
   level:
-    org.springframework.security: DEBUG
+    com:
+      zaxxer:
+        hikari: INFO
+    javax:
+      sql:
+        DataSource: OFF
+    jdbc:
+      audit: OFF # JDBC 트러블슈팅 경우를 제외하고는 사용 권장 X
+      resultset: OFF # ResultSet을 포함한 모든 JDBC 호출 정보를 출력
+      resultsettable: INFO  #SQL 결과 데이터 Table형식으로 출력
+      sqlonly: OFF     #SQL만 로그만 출력
+      sqltiming: INFO    #SQL + 소요시간 출력
+      connection : OFF  # 커넥션 연결/종료 정보 출력
