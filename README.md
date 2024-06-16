@@ -31,33 +31,13 @@
 * TEXT와 이미지 파일형식 전송 가능.
 * 채팅방을 나가면 퇴장 알림 노출.
 
----
-
-.jar파일 생성
-
-```
- .\gradlew.bat build
-```
-Dockerfile build
-
-```
-docker build --tag chatting .
-
-docker run -p 8085:8085 chatting
-
-```
-
-compose 파일
-
-```
-docker-compose up --build
-```
 
 
 
 
-### - presentation
-https://github.com/lhg0314/Chatting-BE/blob/main/presentation/hyojin0206.md
-- [이효진0206](https://github.com/lhg0314/Chatting-BE/blob/main/presentation/hyojin0206.md)
-- [오유민0206](http://git.openobject.net:8880/education/chatting-server/-/blob/main/presentation/yumin0206.md)
-- [서상균0206](http://git.openobject.net:8880/education/chatting-server/-/blob/main/presentation/sangkyun0206.md)
+
+### - view
+
+- [정리 1](https://github.com/lhg0314/Chatting-BE/blob/main/presentation/hyojin0206.md)
+- [정리 2](https://github.com/lhg0314/Chatting-BE/blob/main/presentation/yumin0206.md)
+- [정리 3](https://github.com/lhg0314/Chatting-BE/blob/main/presentation/sangkyun0206.md)
