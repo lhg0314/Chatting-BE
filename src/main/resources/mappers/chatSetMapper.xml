@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 사용자 등록 -->
+<mapper namespace="com.project.chatting.chat.repository.ChatSetRepository">
+
+<!-- 메시지 모두 읽음 처리 -->
+<update id="updateReadYn" parameterType="com.project.chatting.chat.entity.ChatSet">
+
+	UPDATE chatRead
+	SET read_yn = '1'
+	WHERE user_id = #{userId}
+	AND room_id = #{roomId};
+
+</update>
+
+<!-- 읽지 않은사람 수 업데이트  -->
+<update id="updateReadCnt" parameterType="int">
+
+	UPDATE chatContents cc
+	SET readCnt  = (
+	    SELECT COUNT(chat_id)
+	    FROM chatRead cr
+	    WHERE read_yn = '0' AND cc.chat_id  = chat_id 
+	)
+	WHERE room_id = #{roomId};
+
+</update>
+  
+</mapper>

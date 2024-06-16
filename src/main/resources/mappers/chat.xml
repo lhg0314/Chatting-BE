@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 사용자 등록 -->
+<mapper namespace="com.project.chatting.chat.repository.ChatRepository">
+
+  <!-- 채팅방 조회 -->
+  <!-- <select id="findChatRoomByUserId" parameterType="com.project.chatting.chat.request.CreateRoomRequest" resultType="string">
+    SELECT IFNULL(room_id, -1) AS room_id 
+    FROM chatJoin 
+    WHERE user_Id IN (#{toUserId}, #{fromUserId}) GROUP BY room_id HAVING COUNT(DISTINCT user_id) = 2;
+    WHERE user_id IN (
+      <foreach collection="userId" item="user" separator=",">
+        #{user}
+      </foreach>
+    )
+    GROUP BY room_id HAVING COUNT(DISTINCT user_id) = #{userCount};
+  </select> -->
+  <select id="findChatRoomByUserId" parameterType="string">
+    SELECT 
+      a.room_id
+    FROM 
+      (SELECT 
+        COUNT(*) userCount,
+        GROUP_CONCAT(cj.user_id ORDER BY cj.user_id ASC) users, 
+        GROUP_CONCAT(cj.room_state) userStates,
+        room_id 
+      FROM 
+        chatJoin cj 
+      JOIN 
+        user u 
+      ON cj.user_id = u.user_id
+      GROUP BY room_id
+      HAVING userCount = 2) a
+    JOIN chatRoom cr 
+    ON a.room_id = cr.room_id
+    WHERE a.users = #{users} AND a.userStates = ("Y,Y");
+  </select>
+
+
+  <!-- 채팅방 생성 -->
+  <insert id="setChatRoom" parameterType="com.project.chatting.chat.request.CreateRoomRequest" useGeneratedKeys="true" keyProperty="roomId" keyColumn="room_id">
+    INSERT INTO chatRoom (room_name) VALUES (#{roomName})
+  </insert>
+
+  <!-- 채팅방 참여 생성 -->
+  <insert id="setChatJoin" parameterType="java.util.List">
+    INSERT INTO chatJoin (user_id, room_id, room_state) 
+    VALUES 
+    <foreach collection="list" item="item" separator=",">
+    (
+      #{item.userId},
+      #{item.roomId},
+      #{item.roomState}
+    )
+    </foreach>
+  </insert>
+  
+  <select id="getChatMemberCnt" parameterType="int" resultType="int">
+	  SELECT COUNT(*) FROM chatJoin WHERE room_id = #{roomID} AND room_state = "Y"
+  </select>
+  
+  <insert id="setChatMessage" parameterType="com.project.chatting.chat.request.ChatRequest">
+	  INSERT INTO chatContents(room_id, user_id, message, message_type, createAt, readCnt) 
+	  VALUES (#{roomId}, #{userId}, #{message}, #{messageType}, #{createAt}, #{readCnt})
+  </insert>
+  
+  <insert id="setChatRead" parameterType="java.util.List">
+	  INSERT INTO chatRead(room_id, chat_id, user_id, read_yn) 
+	  VALUES 
+	  <foreach collection="list" item="item" separator=",">
+		  (#{item.roomId},
+			  (SELECT chat_id 
+	  			FROM chatContents WHERE user_id = #{item.readMap.creater} AND createAt = #{item.readMap.at} AND room_id=#{item.roomId}),
+			  #{item.readMap.id}, #{item.readMap.yn})
+	  </foreach> 
+  </insert>
+
+  <!-- 채팅방 목록 조회 -->
+  <select id="selectChatRoomList" parameterType="String" resultType="com.project.chatting.chat.response.ChatRoomResponse">
+	SELECT
+	    cr.room_id,
+	    cr.room_name,
+	    COUNT(DISTINCT cj.user_id) AS participants_count,
+	    COUNT(CASE WHEN cj.user_id = #{userId} AND crd.read_yn = '0' THEN 1 END) AS unread_messages,
+	    MAX(CASE WHEN cj.user_id = #{userId} THEN cc.message END) AS last_message,
+	    MAX(CASE WHEN cj.user_id = #{userId} THEN cc.createAt END) AS last_message_date
+	FROM
+	    chatRoom cr
+	JOIN
+	    chatJoin cj ON cr.room_id = cj.room_id
+	LEFT JOIN
+	    chatContents cc ON cr.room_id = cc.room_id
+	LEFT JOIN
+	    chatRead crd ON cr.room_id = crd.room_id AND crd.user_id = cj.user_id
+	WHERE
+	    cj.room_state = 'Y' AND
+	    (cc.createAt IS NULL OR cc.createAt = (
+	        SELECT MAX(createAt)
+	        FROM chatContents
+	        WHERE room_id = cr.room_id AND message_type != 'EXIT'
+	    ))
+	GROUP BY
+	    cr.room_id
+	HAVING
+	    SUM(CASE WHEN cj.user_id = #{userId} THEN 1 ELSE 0 END) > 0
+	ORDER BY
+	    last_message_date DESC
+  </select>
+
+  <!-- 채팅방 존재하는지 확인 -->
+  <select id="existChatRoom" parameterType="int" resultType="int">
+    SELECT COUNT(*) FROM chatRoom WHERE room_id = #{roomId}
+  </select>
+  <!-- 채팅방 나가기 -->
+  <update id="setLeaveChatJoin" parameterType="com.project.chatting.chat.request.LeaveChatRoomRequest">
+    UPDATE chatJoin SET room_state = #{roomState} WHERE user_id = #{userId} AND room_id = ${roomId}
+  </update>
+  
+  <select id="getRoomMember" parameterType="int">
+	  SELECT user_id  FROM chatJoin WHERE chatJoin.room_id = #{roomId} AND room_state = "Y"
+  </select>
+
+  <select id="getMessageList" resultType="com.project.chatting.chat.entity.Chat" parameterType="com.project.chatting.chat.request.ChatListRequest">
+	  SELECT ct.chat_id, ct.room_id, ct.user_id, ct.message, ct.message_type, ct.createAt, ct.readCnt, f.file_name, f.file_ext, f.file_url
+	  FROM chatContents ct LEFT JOIN file f
+	  ON ct.chat_id = f.chat_id
+	  WHERE ct.room_id=#{roomId}
+	  <if test="chatId != 0">
+		  AND ct.chat_id <![CDATA[<]]> #{chatId}
+	  </if>
+	  ORDER BY ct.createAt DESC LIMIT #{cnt}
+  </select>
+
+  <!-- 채팅방 참여 인원수 조회 -->
+  <select id="getChatJoinUsers" parameterType="int" resultType="int">
+    SELECT COUNT(*) FROM chatJoin WHERE room_id = #{roomId} AND room_state = "Y"
+  </select>
+
+  <!-- 채팅방 삭제 -->
+  <delete id="deleteChatRoom" parameterType="int">
+    DELETE FROM chatRoom WHERE room_id = #{roomId}  
+  </delete>
+  
+  <select id="getChatMessageUsers" parameterType="int">
+	  SELECT user_id FROM chatRead WHERE chat_id = #{chatId} AND read_yn="1";
+  </select>
+
+  <!-- 이미지 파일 저장 -->
+  <insert id="setFile" parameterType="com.project.chatting.chat.request.ChatFileRequest">
+    INSERT INTO file (chat_id, file_name, file_ext, file_url)
+    VALUES ((SELECT chat_id FROM chatContents 
+    		WHERE user_id=#{fileMap.creater} AND createAt=#{fileMap.at} AND room_id=#{roomId}),
+    		 #{fileName}, #{fileExt}, #{fileUrl})
+  </insert>
+ <!--
+  <select id="getNextDataYn" resultType="int">
+	  SELECT EXISTS (SELECT 1 FROM chatting_program.chatContents 
+		WHERE room_id=#{roomId}
+		<if test="chatId != 0">
+			AND chat_id <![CDATA[>]]> #{chatId}
+		</if>
+		ORDER BY createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
+  </select>
+  -->
+  <select id="getNextDataYn" resultType="int">
+    SELECT EXISTS (SELECT 1 
+      FROM chatContents ct LEFT JOIN file f 
+      ON ct.chat_id = f.chat_id
+	  WHERE ct.room_id=#{roomId}
+	  <if test="chatId != 0">
+		  AND ct.chat_id <![CDATA[<]]> #{chatId}
+	  </if>
+	  ORDER BY ct.createAt DESC LIMIT 1 OFFSET #{cnt}) AS yn
+  </select>
+  
+  <select id="getExistRoom" resultType="int">
+	  SELECT COUNT(*) FROM chatJoin
+      where room_id=#{roomId}
+      AND user_id=#{userId}
+      AND room_state='Y'
+  </select>
+</mapper>

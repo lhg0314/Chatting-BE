@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello WebSocket</title>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/app.js"></script>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div id="main-content" class="container">
+
+		<div class="row">
+
+			<div class="col-md-6" id="loginN">
+				<form class="form-inline">
+					<div class="form-group">
+						 <input type="text" id="id" class="form-control" placeholder="Your id here...">
+					</div>
+					<div class="form-group">
+						<input type="text" id="pw" class="form-control"
+							placeholder="Your pw here...">
+					</div>
+					<button id="loginAct" class="btn btn-default" type="button">login</button>
+				</form>
+			</div>
+			
+			<div class="col-md-6" id="loginY" style="display: none;">
+				<form class="form-inline">
+					<div class="form-group">
+						you are login with : <span id="loginName" >name</span>
+					</div>
+				</form>
+			</div>
+			<input type="hidden" id="token">
+				
+		</div>
+		<div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="connect">WebSocket connection:</label>
+                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
+                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="name">메시지를 입력해보세요</label>
+                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                </div>
+                <button id="send" class="btn btn-default" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <img id ="myImg"src="upload/1/272ac514-0af8-4a25-b1f5-1c5a283817e9.jpg" alt="My Image">
+    <div class="row">
+        <div class="col-md-12">
+            <table id="conversation" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Greetings</th>
+                </tr>
+                </thead>
+                <tbody id="greetings">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

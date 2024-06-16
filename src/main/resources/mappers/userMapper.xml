@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 사용자 등록 -->
+<mapper namespace="com.project.chatting.user.repository.UserRepository">
+
+
+	<insert id="setInsertMember" parameterType="com.project.chatting.user.entity.User">
+		INSERT INTO user
+            (
+                user_id  
+                , user_pw
+                , user_name  
+            )
+        VALUES
+            (
+                #{userId}
+                , #{userPw}
+                , #{name}
+            )
+	</insert>
+	
+	<!-- 회원정보 조회 -->
+	<select id="findMemberById"  parameterType="String" resultType="com.project.chatting.user.entity.User">
+        SELECT * FROM user WHERE user_id = #{userId}
+    </select>
+    
+    <select id="getSortedUserList" resultType="com.project.chatting.user.entity.User">
+		SELECT * FROM user ORDER BY user_name
+	</select>
+</mapper>
