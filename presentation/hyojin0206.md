@@ -1,9 +1,3 @@
-## 채팅 프로젝트 (~ 2월 1주차)
-
-
-<br>
-
-<br>
 
 #### 회원가입 & 로그인 프로세스
 
@@ -180,46 +174,7 @@ stompClient.connect 함수 실행 시 수행 , jwt인증 수행
 
 
 
-## 채팅 프로젝트 (~ 2월 2주차)
 
-- stompHandler
-- 채팅방 목록 조회
-
-> connction access 데이터
-
-<br>
-![CONNECTION](/presentation/KakaoTalk_20240213_233602891.png)
-<br><br>
-
-
-> 레디스 조회 데이터
-
-
-![CONNECTION](/presentation/KakaoTalk_20240213_213231829.png)
-<br>
-![CONNECTION](/presentation/KakaoTalk_20240213_213839098.png)
-<br><br>
-
-> 인증 처리
-
-
-![CONNECTION](/presentation/KakaoTalk_20240213_222752554.png)
-<br><br><br>
-
-
-#### 사용 예시
-
-<br>
-![CONNECTION](/presentation/KakaoTalk_20240213_235942593.png)
-<br><br>
-
-#### 채팅방 목록 조회
-
-<br>
-![CONNECTION](/presentation/KakaoTalk_20240213_232915762.png)
-<br>
-![CONNECTION](/presentation/KakaoTalk_20240213_230700222.png)
-<br>
 
 
 
