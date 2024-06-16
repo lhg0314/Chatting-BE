@@ -68,18 +68,13 @@ public class ControllerAdvice {
 
     }
     
-    /**
-     * 500 Internal Server Error
-     */
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    protected ApiResponse<Object> handleException(final Exception exception) {
-        log.error(exception.getMessage(), exception);
-        final ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_EXCEPTION;
-        return ApiResponse.error(errorCode);
-    
-    }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidationException.class)
+    protected ApiResponse<Object> handleValidationException(final ValidationException exception) {
+        log.error(exception.getMessage(), exception);
+        return ApiResponse.error(exception.getErrorCode());
+    }
 
     /**
      * 401 UnAuthorized
@@ -110,6 +105,18 @@ public class ControllerAdvice {
         log.error(exception.getMessage(), exception);
         return ApiResponse.error(exception.getErrorCode());
     }
+    
+    /**
+     * 500 Internal Server Error
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    protected ApiResponse<Object> handleException(final Exception exception) {
+        log.error(exception.getMessage(), exception);
+        final ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_EXCEPTION;
+        return ApiResponse.error(errorCode);
+    
+    }
 
     /**
      * Token Expired Exception 
@@ -120,23 +127,15 @@ public class ControllerAdvice {
         return ApiResponse.error(exception.getErrorCode());
     }
 
-    /**
-     * File Validate Exception
-     */
-    @ExceptionHandler(ValidationException.class)
-    protected ApiResponse<Object> handleFileValidateException(ValidationException exception){
-        log.error(exception.getMessage(), exception);
-        return ApiResponse.error(ErrorCode.VALIDATION_FILE_FORMAT_EXCEPTION);
-    }
-
-    /**
-     * File Max size Exception
-     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     protected ApiResponse<Object> handleFileMaxSizeExceededException(final MaxUploadSizeExceededException exception){
         log.error(exception.getMessage(), exception);
         return ApiResponse.error(ErrorCode.EXCEEDED_FILE_EXCEPTION);
     }
+
+
+
 
 
 

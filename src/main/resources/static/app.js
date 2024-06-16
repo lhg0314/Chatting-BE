@@ -15,6 +15,7 @@ function setConnected(connected) {
 function connect() {
     var socket = new SockJS('/ws');// 로컬에서는  /ws로 해야 함
     let headers = {Authorization: $('#token').val()};
+   //let headers = {Authorization:"sdfd"};
     stompClient = Stomp.over(socket);
     stompClient.connect(headers, function (frame) {
         setConnected(true);
@@ -22,9 +23,11 @@ function connect() {
         
         
         stompClient.subscribe('/sub/room/1', function (greeting) {
-			console.log(JSON.parse(greeting.body))
+			console.log("응답"+JSON.parse(greeting.body))
             showGreeting(JSON.parse(greeting.body).data.msg);
         },headers);
+    },function (error) {
+		if(error?.body != undefined) console.log(JSON.parse(error.body))
     });
 }
 
@@ -38,7 +41,7 @@ function disconnect() {
 }
 
 function sendName() {
-    stompClient.send("/pub/chat/1", {}, JSON.stringify({'msg': $("#name").val()}));
+    stompClient.send("/pub/chat/1", {}, JSON.stringify({'message': $("#name").val(),'userId':$("#loginName").text()}));
 }
 
 function showGreeting(message) {

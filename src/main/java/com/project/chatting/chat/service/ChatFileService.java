@@ -90,7 +90,7 @@ public class ChatFileService {
             folder.delete();
         }
 
-        if(root.listFiles().length == 0){
+        if(root.exists() && root.listFiles().length == 0){
             root.delete();
         }
                 

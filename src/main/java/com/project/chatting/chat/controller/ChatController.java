@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,8 @@ import com.project.chatting.chat.response.CreateRoomResponse;
 import com.project.chatting.chat.service.ChatFileService;
 import com.project.chatting.chat.service.ChatService;
 import com.project.chatting.common.ApiResponse;
+import com.project.chatting.common.ErrorCode;
+import com.project.chatting.exception.ValidationException;
 import com.project.chatting.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,11 +84,13 @@ public class ChatController {
 	 */
 	@PostMapping(value = "/chat/upload", consumes="multipart/form-data")
 	@Operation(summary = "파일 업로드")
-	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest){
-		System.out.println(ChatFileRequest.toString());
+	public ApiResponse<ChatFileResponse> sendFile(@ModelAttribute ChatFileRequest ChatFileRequest, BindingResult bindingResult){
+		if(bindingResult.hasErrors()){
+			throw new ValidationException("파일을 첨부하여 보내주세요!",ErrorCode.CONFLICT_FILE_EXCEPTION);
+		
+		}
 		return ApiResponse.success(chatFileService.setFile(ChatFileRequest, "src\\main\\resources\\static\\upload"));
 	}
-
 	/**
 	 * 채팅방 생성
 	 */

@@ -19,7 +19,6 @@ import com.project.chatting.chat.repository.ChatRoomRepository;
 import com.project.chatting.chat.request.ChatReadRequest;
 import com.project.chatting.chat.service.ChatSetService;
 import com.project.chatting.common.ErrorCode;
-import com.project.chatting.exception.TokenException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

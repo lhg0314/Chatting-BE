@@ -21,7 +21,7 @@ import com.project.chatting.auth.JwtTokenProvider;
 import com.project.chatting.auth.RefreshToken;
 import com.project.chatting.common.ErrorCode;
 import com.project.chatting.exception.ConflictException;
-import com.project.chatting.exception.TokenException;
+import com.project.chatting.exception.ValidationException;
 import com.project.chatting.user.entity.User;
 import com.project.chatting.user.repository.UserRepository;
 import com.project.chatting.user.request.signinRequest;
@@ -55,14 +55,14 @@ public class UserService  {
 		 User getuser = userRepository.findMemberById(user.getUserId());
 	
 			if (getuser != null) {
-				throw new ConflictException(String.format("중복되는 멤버 (%s - %s) 입니다", user.getUserId(), getuser.getUsername()), ErrorCode.CONFLICT_MEMBER_EXCEPTION);
+				throw new ValidationException(String.format("중복되는 멤버 (%s - %s) 입니다", user.getUserId(), getuser.getUsername()), ErrorCode.CONFLICT_MEMBER_EXCEPTION);
 			}
 	        return userRepository.setInsertMember(user);
 	    }
 
 	public RefreshToken login(signinRequest signinReq, HttpServletResponse response) {
 		User userDetails = userRepository.findMemberById(signinReq.getUserId());
-       if(userDetails == null) throw new ConflictException(String.format("아이디에 해당하는 회원정보가 없습니다."), ErrorCode.VALIDATION_EXCEPTION);
+       if(userDetails == null) throw new ValidationException(String.format("아이디에 해당하는 회원정보가 없습니다."), ErrorCode.VALIDATION_EXCEPTION);
         checkPassword(signinReq.getUserPw(), userDetails.getUserPw());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUserId(), userDetails.getUserPw());
         String accessToken = jwtTokenProvider.createAccessToken(authentication); // Access Token 발급
@@ -80,7 +80,7 @@ public class UserService  {
 	
 	private void checkPassword(String password, String encodedPassword) {
         if (!passwordEncoder.matches(password, encodedPassword)) {
-            throw new ConflictException(String.format("비밀번호를 다시 입력해주세요"), ErrorCode.VALIDATION_EXCEPTION);
+            throw new ValidationException(String.format("비밀번호를 다시 입력해주세요"), ErrorCode.VALIDATION_EXCEPTION);
         }
     }
 

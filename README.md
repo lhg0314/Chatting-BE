@@ -31,6 +31,27 @@
 * TEXT와 이미지 파일형식 전송 가능.
 * 채팅방을 나가면 퇴장 알림 노출.
 
+---
+
+.jar파일 생성
+
+```
+ .\gradlew.bat build
+```
+Dockerfile build
+
+```
+docker build --tag chatting .
+
+docker run -p 8085:8085 chatting
+
+```
+
+compose 파일
+
+```
+docker-compose up --build
+```
 
 
 
